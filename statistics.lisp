@@ -15,7 +15,7 @@
   (list 
    :min (reduce #'min numbers)
    :max (reduce #'max numbers)
-   :mean (mean numbers)
+   :mean (round (mean numbers))
    :median (median numbers)
    :standard-deviation (standard-deviation numbers)
    :data-points (length numbers)))
