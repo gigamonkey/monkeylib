@@ -6,5 +6,6 @@
 	   :median
 	   :mode
 	   :variance
-	   :standard-deviation))
+           :standard-deviation
+	   :numbers-stats))
 
