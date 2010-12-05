@@ -1,68 +1,31 @@
 (in-package :com.gigamonkeys.markup.html)
 
-(defparameter *amazon-link* "http://www.amazon.com/gp/product/~a?ie=UTF8&tag=gigamonkeys-20&linkCode=as2&camp=1789&creative=9325&creativeASIN=~:*~a")
+(defparameter *default-subdocument-tags* '(:note :comment))
 
-(defparameter *amazon-image-bug* "http://www.assoc-amazon.com/e/ir?t=gigamonkeys-20&l=as2&o=1&a=~a")
-
-(defparameter *asins*
-  (progn
-    (let ((ht (make-hash-table :test #'equal)))
-      (loop for (k v) in 
-           '(("Peopleware" "0932633439")
-             ("Practical Common Lisp" "1590592395")
-             ("Rapid Development" "1556159005")
-             ("Software Estimation" "0735605351")
-             ("Software Estimation: Demystifying the Black Art" "0735605351")
-             ("The Mythical Man Month" "0201835959")
-             ("The Wisdom of Crowds" "0385503865")
-             ("Founders at Work" "1590597141")
-             ("Programmers at Work" "0914845713")
-             ("Coders at Work" "1430219483" )
-             ("Land of Lisp" "1593272006")
-             ("Beautiful Code" "0596510047")
-             ("Test Driven Development" "0321146530")
-             ("The C++ Programming Language" "0201700735")
-             ("The Design and Evolution of C++" "0201543303")
-             ("Pink Brain, Blue Brain" "0618393110"))
-           do (setf (gethash k ht) v))
-      ht)))
-
-(defun amazon-link (sexp)
-  (let* ((asin (gethash (just-text sexp) *asins*))
-         (href (format nil *amazon-link* asin)))
-    `((:a :href ,href) (:i ,@(rest sexp)))))
-
-(defun amazon-image-bug (sexp)
-  (let* ((asin (gethash (just-text sexp) *asins*))
-         (src (format nil *amazon-image-bug* asin)))
-    `(:img :src ,src :width "1" :height "1" :alt "" :style "border:none !important; margin:0px !important;")))
-
-(defun mailto-link (sexp)
-  `(:a :href ,(format nil "mailto:~a" (just-text sexp)) ,@(rest sexp)))
-
-(defparameter *tag-mappings*
-  '((:book . amazon-link)
-    (:amazon-image-bug . amazon-image-bug)
-    (:email . mailto-link)
-    (:n . (:span :class "name"))))
-
-(defun render (file &key title stylesheets scripts (links t) (subdocument-tags '(:note :comment)))
-  "Render `file' to an html file."
+(defun render (file &key title stylesheets scripts (links t) (subdocument-tags *default-subdocument-tags*))
+  "Render `file' to an html file with a header made from `title',
+`stylesheets', and `scripts'. If `title' is not supplied, we try to
+guess from the first H1 in sexps. Tags specified with
+`subdocument-tags' are parsed as subdocuments."
   (with-output-to-file (out (make-pathname :type "html" :defaults file))
     (render-to-stream
      file out
      :title title
      :stylesheets stylesheets
      :scripts scripts
-     :links links)))
+     :links links
+     :subdocument-tags subdocument-tags)))
 
 (defun render-to-stream (file out &key
                          title 
                          stylesheets
                          scripts
                          (links t) 
-                         (subdocument-tags '(:note :comment)))
-  "Render `file' to the stream `out'."
+                         (subdocument-tags *default-subdocument-tags*))
+  "Render `file' to the stream `out' with a header made from `title',
+`stylesheets', and `scripts'. If `title' is not supplied, we try to
+guess from the first H1 in sexps. Tags specified with
+`subdocument-tags' are parsed as subdocuments."
   (render-sexps-to-stream
    (parse-file file :parse-links-p links :subdocument-tags subdocument-tags) out
    :title title
@@ -121,60 +84,52 @@ guess from the first H1 in sexps."
         (symbol (funcall mapper sexp))))))
 
 (defun fix-notes (sexp)
-  (let ((note-num 0)
-        (notes ()))
+  (extract-things sexp :note #'make-reference/note #'make-replacement/note))
 
-    (labels ((walker (x)
-               (cond
-                 ((stringp x) x)
-                 ((symbolp x) x)
-                 ((eql (car x) :note)
-                  (push x notes)
-                  (let ((num (incf note-num)))
-                    `(:a :name ,(format nil "noteref_~d" num) (:a :href ,(format nil "#note_~d" num) (:sup ,(princ-to-string num))))))
-                 (t `(,(car x) ,@(mapcar #'walker (cdr x)))))))
+(defun make-replacement/note (what num)
+  `(:a :name ,(format nil "~(~a~)ref_~d" what num)
+       (:a :href ,(format nil "#~(~a~)_~d" what num) (:sup ,(princ-to-string num)))))
 
-      (let ((walked (walker sexp)))
-        `(,@walked 
-          ((:div :class "notes")
-           ,@(loop for num from 1 
-                for note in (nreverse notes)
-                collect 
-                  (destructuring-bind (notetag (ptag . prest) . nrest) note
-                    (declare (ignore notetag))
-                    `((:div :class "note")
-                      (,ptag
-                       (:a :name ,(format nil "note_~d" num) (:a :href ,(format nil "#noteref_~d" num) (:sup ,(princ-to-string num)))) " "
-                       ,@prest)
-                      ,@nrest)))))))))
+(defun make-reference/note (what num)
+  (declare (ignore what))
+  `((:sup ,(princ-to-string num))))
 
 (defun fix-comments (sexp)
-  (let ((comment-num 0)
-        (comments ()))
+  (extract-things sexp :comment #'make-reference/comment #'make-replacement/comment))
+
+(defun make-replacement/comment (what num)
+  `(:a :name ,(format nil "~(~a~)ref_~d" what num) (:a :href ,(format nil "#~(~a~)_~d" what num) :class ,(format nil "~(~a~)_ref" what) ,(format nil "~:(~a~) " what) ,(princ-to-string num))))
+
+(defun make-reference/comment (what num)
+  `(:class ,(format nil "~(~a~)_number" what) ,(princ-to-string num)))
+
+(defun extract-things (sexp what make-replacement make-reference)
+  (let ((thing-num 0)
+        (things ()))
 
     (labels ((walker (x)
                (cond
                  ((stringp x) x)
                  ((symbolp x) x)
-                 ((eql (car x) :comment)
-                  (push x comments)
-                  (let ((num (incf comment-num)))
-                    `(:a :name ,(format nil "commentref_~d" num) (:a :href ,(format nil "#comment_~d" num) :class "comment_ref" "Comment " ,(princ-to-string num)))))
+                 ((eql (car x) what)
+                  (push x things)
+                  (funcall make-replacement what (incf thing-num)))
                  (t `(,(car x) ,@(mapcar #'walker (cdr x)))))))
 
       (let ((walked (walker sexp)))
         `(,@walked 
-          ((:div :class "comments")
+          ((:div :class ,(format nil "~(~a~)s" what))
            ,@(loop for num from 1 
-                for comment in (nreverse comments)
+                for thing in (nreverse things)
                 collect 
-                  (destructuring-bind (commenttag (ptag . prest) . nrest) comment
-                    (declare (ignore commenttag))
-                    `((:div :class "comment")
+                  (destructuring-bind (thingtag (ptag . prest) . nrest) thing
+                    (declare (ignore thingtag))
+                    `((:div :class ,(format nil "~(~a~)" what))
                       (,ptag
-                       (:a :name ,(format nil "comment_~d" num) (:a :href ,(format nil "#commentref_~d" num) :class "comment_number" ,(princ-to-string num))) " "
+                       (:a :name ,(format nil "~(~a~)_~d" what num) (:a :href ,(format nil "#~(~a~)ref_~d" what num) ,@(funcall make-reference what num))) " "
                        ,@prest)
                       ,@nrest)))))))))
+
 
 (defun add-amazon-image-bugs (sexp)
   (let ((books ()))
