@@ -1,6 +1,0 @@
-
-(:BODY (:PRE "This is some verbatim text.
-
-  This bit is indented some.
-
-    This is indented some more.")) 

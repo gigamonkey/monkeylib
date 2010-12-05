@@ -1,3 +1,0 @@
-This is a [link] test.
-
-This is a [link with \i{markup} in it] test.
