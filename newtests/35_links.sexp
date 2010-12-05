@@ -1,2 +1,0 @@
-
-(:BODY (:P "Regular " (:LINK "text") " with " (:LINK "links" (:KEY "foo")) " blah.") (:LINK_DEF (:LINK "text") (:URL "http://www.example.com/text/")) (:LINK_DEF (:LINK "foo") (:URL "http://www.example.com/foo/"))) 

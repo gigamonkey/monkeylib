@@ -1,5 +1,0 @@
-  This is a blockquote.
-
-  This is a second paragraph in a blockquote.
-
-  This is a third paragraph in the blockquote.

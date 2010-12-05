@@ -1,5 +1,0 @@
-  # Item number one
-
-  # Item number two
-
-  # Item number three

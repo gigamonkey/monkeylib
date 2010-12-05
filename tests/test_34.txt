@@ -1,3 +1,0 @@
-   This is verbatim.
-
-  This is blockquote.

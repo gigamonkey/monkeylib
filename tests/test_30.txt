@@ -1,4 +1,0 @@
-\i{Paragraph starting with italic.} Not italic.
-
-This is a regular paragraph.\note{\i{Note starting with italic.} Not italic.} Rest of paragraph.
-
