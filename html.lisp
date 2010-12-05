@@ -46,7 +46,7 @@
     (:email . mailto-link)
     (:n . (:span :class "name"))))
 
-(defun render (file &key title stylesheets scripts (links t))
+(defun render (file &key title stylesheets scripts (links t) (subdocument-tags '(:note :comment)))
   "Render `file' to an html file."
   (with-output-to-file (out (make-pathname :type "html" :defaults file))
     (render-to-stream
@@ -56,16 +56,23 @@
      :scripts scripts
      :links links)))
 
-(defun render-to-stream (file out &key title stylesheets scripts (links t))
+(defun render-to-stream (file out &key
+                         title 
+                         stylesheets
+                         scripts
+                         (links t) 
+                         (subdocument-tags '(:note :comment)))
   "Render `file' to the stream `out'."
   (render-sexps-to-stream
-   (parse-file file :parse-links-p links) out
+   (parse-file file :parse-links-p links :subdocument-tags subdocument-tags) out
    :title title
    :stylesheets stylesheets
    :scripts scripts))
 
 (defun render-sexps-to-stream (sexps out &key title stylesheets scripts)
-  "Render `sexps' to `out' with a header made from `title', `stylesheets', and `scripts'."
+  "Render `sexps' to `out' with a header made from `title',
+`stylesheets', and `scripts'. If `title' is not supplied, we try to
+guess from the first H1 in sexps."
   (with-foo-output (out)
     (emit-html
      `(:html
@@ -76,24 +83,18 @@
   `(:head
     (:title ,title)
     (:meta :http-equiv "Content-Type" :content "text/html; charset=UTF-8")
-    ,@(loop for stylesheet in stylesheets collect
-           `(:link :rel "stylesheet" :href ,stylesheet :type "text/css"))
-    ,@(loop for script in scripts collect `(:script :src ,script))))
+    ,@(loop for s in stylesheets collect `(:link :rel "stylesheet" :href ,s :type "text/css"))
+    ,@(loop for s in scripts collect `(:script :src ,s))))
 
-(defun render-foo (file &key (parse-links-p t) (subdocument-tags '(:note :comment)))
-  (multiple-value-bind (sexps links) (extract-link-defs (parse-file file
-                                                                    :parse-links-p parse-links-p
-                                                                    :subdocument-tags subdocument-tags))
-    (loop for x in (rest
-                    (fix-comments (fix-notes (rewrite-links (remap-tags (add-amazon-image-bugs sexps)) links))))
-       do (emit-html x))))
+(defun rewrite-body (sexps) 
+  (multiple-value-bind (sexps links) (extract-link-defs sexps)
+    (fix-comments (fix-notes (rewrite-links (remap-tags (add-amazon-image-bugs sexps)) links)))))
 
 (defun guess-title (sexps)
-  (let ((possible-h1 (second sexps)))
-    (cond
-      ((and possible-h1 (eql (first possible-h1) :h1))
-       (just-text possible-h1))
-      (t "Title"))))
+  (let ((first-h1 (find :h1 sexps :key (lambda (x) (and (consp x) (first x))))))
+    (if first-h1
+        (just-text first-h1)
+        (format nil "HTML generated at ~/iso:8601/" (get-universal-time)))))
 
 (defun just-text (sexp)
   (with-output-to-string (s)
@@ -102,18 +103,6 @@
                  (string (write-string x s))
                  (cons (mapcar #'walker x)))))
       (walker sexp))))
-
-(defun rewrite-sexps (sexps title stylesheet) 
-  `(:html
-     (:head
-      (:title ,title)
-      (:meta :http-equiv "Content-Type" :content "text/html; charset=UTF-8")
-      ,@(if stylesheet `((:link :rel "stylesheet" :href ,stylesheet :type "text/css"))))
-     ,(rewrite-body sexps)))
-
-(defun rewrite-body (sexps) 
-  (multiple-value-bind (sexps links) (extract-link-defs sexps)
-    (fix-comments (fix-notes (rewrite-links (remap-tags (add-amazon-image-bugs sexps)) links)))))
 
 (defun remap-tags (sexp)
   (labels ((walker (x)
@@ -200,7 +189,6 @@
 
       (let ((walked (walker sexp)))
         `(,@walked ,@(mapcar (lambda (x) `(:amazon-image-bug ,x)) (nreverse books)))))))
-
 
 (defun extract-link-defs (sexp)
   (let ((links (make-hash-table :test #'equalp))

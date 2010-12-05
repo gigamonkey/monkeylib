@@ -8,4 +8,8 @@
   (:use :common-lisp
         :com.gigamonkeys.markup
         :com.gigamonkeys.utilities
-        :com.gigamonkeys.foo))
+        :com.gigamonkeys.foo)
+  (:export
+   :render
+   :render-to-stream
+   :render-sexps-to-stream))
