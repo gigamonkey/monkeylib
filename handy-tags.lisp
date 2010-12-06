@@ -37,6 +37,20 @@
          (src (format nil *amazon-image-bug* asin)))
     `(:img :src ,src :width "1" :height "1" :alt "" :style "border:none !important; margin:0px !important;")))
 
+(defun add-amazon-image-bugs (sexp)
+  (let ((books ()))
+    (labels ((walker (x)
+               (cond
+                 ((stringp x) x)
+                 ((symbolp x) x)
+                 ((eql (car x) :book)
+                  (push (just-text x) books)
+                  x)
+                 (t `(,(car x) ,@(mapcar #'walker (cdr x)))))))
+
+      (let ((walked (walker sexp)))
+        `(,@walked ,@(mapcar (lambda (x) `(:amazon-image-bug ,x)) (nreverse books)))))))
+
 (defun mailto-link (sexp)
   `(:a :href ,(format nil "mailto:~a" (just-text sexp)) ,@(rest sexp)))
 

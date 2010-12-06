@@ -12,4 +12,5 @@
   (:export
    :render
    :render-to-stream
-   :render-sexps-to-stream))
+   :render-sexps-to-stream
+   :footnotes))
