@@ -23,7 +23,9 @@
              ("Test Driven Development" "0321146530")
              ("The C++ Programming Language" "0201700735")
              ("The Design and Evolution of C++" "0201543303")
-             ("Pink Brain, Blue Brain" "0618393110"))
+             ("Pink Brain, Blue Brain" "0618393110")
+             ("Structure and Interpretation of Computer Programs" "0262011530")
+             )
            do (setf (gethash k ht) v))
       ht)))
 
@@ -54,8 +56,5 @@
 (defun mailto-link (sexp)
   `(:a :href ,(format nil "mailto:~a" (just-text sexp)) ,@(rest sexp)))
 
-(defparameter *tag-mappings*
-  '((:book . amazon-link)
-    (:amazon-image-bug . amazon-image-bug)
-    (:email . mailto-link)
-    (:n . (:span :class "name"))))
+(defun url-link (sexp)
+  `(:a :href ,(just-text sexp) ,@(rest sexp)))

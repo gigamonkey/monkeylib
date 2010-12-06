@@ -11,5 +11,6 @@
    (:file "handy-tags" :depends-on ("packages")))
   :depends-on
   (:com.gigamonkeys.macro-utilities
+   :alexandria
    :com.gigamonkeys.utilities
    :com.gigamonkeys.foo))

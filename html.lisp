@@ -49,7 +49,10 @@ guess from the first H1 in sexps."
     (emit-html
      `(:html
         ,(make-head (or title (guess-title sexps)) stylesheets scripts)
-        ,(rewrite-body sexps tag-mappings)))))
+        ,(rewrite-body sexps
+                       (list #'add-amazon-image-bugs)
+                       (list #'fix-comments #'fix-notes)
+                       tag-mappings)))))
 
 (defun make-head (title stylesheets scripts)
   `(:head
@@ -58,13 +61,14 @@ guess from the first H1 in sexps."
     ,@(loop for s in stylesheets collect `(:link :rel "stylesheet" :href ,s :type "text/css"))
     ,@(loop for s in scripts collect `(:script :src ,s))))
 
-(defun rewrite-body (sexps tag-mappings) 
+(defun rewrite-body (sexps pre-mapping post-mapping tag-mappings)
+  "Given `sexps' extract the link-defs and then process the remaining
+sexp first with the pre-mapping processors, then remap tags and
+rewrite links, and finally with the post-mapping processors."
   (multiple-value-bind (sexps links) (extract-link-defs sexps)
-    (fix-comments
-     (fix-notes
-      (rewrite-links
-       (remap-tags (add-amazon-image-bugs sexps) tag-mappings)
-       links)))))
+    (let ((pre (apply #'compose pre-mapping))
+          (post (apply #'compose post-mapping)))
+      (funcall post (rewrite-links (remap-tags (funcall pre sexps) tag-mappings) links)))))
 
 (defun guess-title (sexps)
   (let ((first-h1 (find :h1 sexps :key (lambda (x) (and (consp x) (first x))))))
