@@ -12,5 +12,6 @@
   :depends-on
   (:com.gigamonkeys.macro-utilities
    :alexandria
+   :com.gigamonkeys.markup
    :com.gigamonkeys.utilities
    :com.gigamonkeys.foo))
