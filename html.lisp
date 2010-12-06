@@ -8,7 +8,7 @@
                scripts
                (links t)
                (subdocument-tags *default-subdocument-tags*)
-               tag-mappings)
+               rewriter)
   "Render `file' to an html file with a header made from `title',
 `stylesheets', and `scripts'. If `title' is not supplied, we try to
 guess from the first H1 in sexps. Tags specified with
@@ -21,7 +21,7 @@ guess from the first H1 in sexps. Tags specified with
      :scripts scripts
      :links links
      :subdocument-tags subdocument-tags
-     :tag-mappings tag-mappings)))
+     :rewriter rewriter)))
 
 (defun render-to-stream (file out &key
                          title 
@@ -29,7 +29,7 @@ guess from the first H1 in sexps. Tags specified with
                          scripts
                          (links t) 
                          (subdocument-tags *default-subdocument-tags*)
-                         tag-mappings)
+                         rewriter)
   "Render `file' to the stream `out' with a header made from `title',
 `stylesheets', and `scripts'. If `title' is not supplied, we try to
 guess from the first H1 in sexps. Tags specified with
@@ -39,9 +39,9 @@ guess from the first H1 in sexps. Tags specified with
    :title title
    :stylesheets stylesheets
    :scripts scripts
-   :tag-mappings tag-mappings))
+   :rewriter rewriter))
 
-(defun render-sexps-to-stream (sexps out &key title stylesheets scripts tag-mappings)
+(defun render-sexps-to-stream (sexps out &key title stylesheets scripts rewriter)
   "Render `sexps' to `out' with a header made from `title',
 `stylesheets', and `scripts'. If `title' is not supplied, we try to
 guess from the first H1 in sexps."
@@ -49,10 +49,7 @@ guess from the first H1 in sexps."
     (emit-html
      `(:html
         ,(make-head (or title (guess-title sexps)) stylesheets scripts)
-        ,(rewrite-body sexps
-                       (list #'add-amazon-image-bugs)
-                       (list #'fix-comments #'fix-notes)
-                       tag-mappings)))))
+        ,(funcall rewriter sexps)))))
 
 (defun make-head (title stylesheets scripts)
   `(:head
@@ -84,6 +81,9 @@ rewrite links, and finally with the post-mapping processors."
                  (cons (mapcar #'walker x)))))
       (walker sexp))))
 
+(defun make-retagger (mappings)
+  (lambda (sexp) (remap-tags sexp mappings)))
+
 (defun remap-tags (sexp mappings)
   (labels ((walker (x)
              (cond
@@ -104,6 +104,10 @@ rewrite links, and finally with the post-mapping processors."
 
 (defun fix-notes (sexp) (footnotes :note sexp))
 
+(defun htmlize-links (sexps)
+  (multiple-value-bind (sexps links) (extract-link-defs sexps)
+    (rewrite-links sexps links)))
+    
 (defun extract-link-defs (sexp)
   (let ((links (make-hash-table :test #'equalp))
         (strip (gensym)))

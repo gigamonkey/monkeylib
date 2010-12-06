@@ -14,4 +14,8 @@
    :render
    :render-to-stream
    :render-sexps-to-stream
-   :footnotes))
+   :footnotes
+   :htmlize-links
+   :make-retagger
+   :footnotes
+   :add-amazon-image-bugs))
