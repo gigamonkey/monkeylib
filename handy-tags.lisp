@@ -1,5 +1,12 @@
 (in-package :com.gigamonkeys.markup.html)
 
+;;;
+;;; FIXME: Some of this stuff should be moved out of monkeylib as it's
+;;; very specific to me. Though everyone should feel free to make
+;;; links to amazon with this code. ;-)
+;;;
+
+
 (defparameter *amazon-link* "http://www.amazon.com/gp/product/~a?ie=UTF8&tag=gigamonkeys-20&linkCode=as2&camp=1789&creative=9325&creativeASIN=~:*~a")
 
 (defparameter *amazon-image-bug* "http://www.assoc-amazon.com/e/ir?t=gigamonkeys-20&l=as2&o=1&a=~a")
