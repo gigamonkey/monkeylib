@@ -9,6 +9,7 @@
         :com.gigamonkeys.markup
         :com.gigamonkeys.utilities
         :com.gigamonkeys.foo)
+  (:import-from :alexandria :compose)
   (:export
    :render
    :render-to-stream
