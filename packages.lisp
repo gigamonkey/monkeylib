@@ -18,4 +18,11 @@
    :htmlize-links
    :make-retagger
    :footnotes
-   :add-amazon-image-bugs))
+   :just-text))
+
+(defpackage :com.gigamonkeys.markup.html.handy-tags
+  (:use :common-lisp :com.gigamonkeys.markup.html)
+  (:export
+   :add-amazon-image-bugs
+   :mailto-link
+   :url-link))

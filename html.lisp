@@ -107,6 +107,7 @@ guess from the first H1 in sexps."
                  (t `(,(car x) ,@(remove strip (mapcar #'walker (cdr x))))))))
       (values (walker sexp) links))))
 
+
 (defun rewrite-links (sexp links)
   (labels ((walker (x)
              (cond
