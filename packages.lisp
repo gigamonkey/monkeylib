@@ -7,5 +7,6 @@
 	   :mode
 	   :variance
            :standard-deviation
-	   :numbers-stats))
+	   :numbers-stats
+           :normal-random-number))
 

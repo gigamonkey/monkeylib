@@ -8,8 +8,16 @@
   (elt (sort (copy-seq numbers) #'<) (floor (length numbers) 2)))
 
 (defun mode (numbers)
-  (declare (ignore numbers))
-  (error "nyi"))
+  (let ((counts (make-hash-table)))
+    (loop for n in numbers do (incf (gethash n counts 0)))
+    (loop with highest = 0
+       with mode = nil
+       for n in numbers 
+       for count = (gethash n counts)
+       when (> count highest) do
+         (setf highest count)
+         (setf mode n)
+       finally (return mode))))
 
 (defun numbers-stats (numbers)
   (list 
