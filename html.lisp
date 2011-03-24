@@ -8,7 +8,7 @@
                scripts
                (links t)
                (subdocument-tags *default-subdocument-tags*)
-               rewriter)
+               (rewriter #'identity))
   "Render `file' to an html file with a header made from `title',
 `stylesheets', and `scripts'. If `title' is not supplied, we try to
 guess from the first H1 in sexps. Tags specified with
@@ -86,7 +86,9 @@ guess from the first H1 in sexps."
         (null `(,tag ,@(mapcar walker-fn content)))
         (keyword `(,mapper ,@(mapcar walker-fn content)))
         (cons `(,mapper ,@(mapcar walker-fn content)))
-        (symbol (funcall mapper sexp))))))
+        ((or symbol function)
+         (multiple-value-bind (mapped recurse) (funcall mapper sexp)
+           (if recurse (funcall walker-fn mapped) mapped)))))))
 
 (defun htmlize-links (sexps)
   (multiple-value-bind (sexps links) (extract-link-defs sexps)
