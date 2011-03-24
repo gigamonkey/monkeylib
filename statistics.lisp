@@ -2,7 +2,7 @@
 
 (defun mean (numbers)
   (let ((length (length numbers)))
-    (values (/ (apply #'+ numbers) length) length)))
+    (values (/ (reduce #'+ numbers) length) length)))
 
 (defun median (numbers)
   (elt (sort (copy-seq numbers) #'<) (floor (length numbers) 2)))
@@ -23,7 +23,7 @@
   (list 
    :min (reduce #'min numbers)
    :max (reduce #'max numbers)
-   :mean (round (mean numbers))
+   :mean (float (mean numbers) 0d0)
    :median (median numbers)
    :standard-deviation (standard-deviation numbers)
    :data-points (length numbers)))
