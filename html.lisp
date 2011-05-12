@@ -29,7 +29,7 @@ guess from the first H1 in sexps. Tags specified with
                          scripts
                          (links t) 
                          (subdocument-tags *default-subdocument-tags*)
-                         rewriter)
+                         (rewriter #'identity))
   "Render `file' to the stream `out' with a header made from `title',
 `stylesheets', and `scripts'. If `title' is not supplied, we try to
 guess from the first H1 in sexps. Tags specified with
@@ -41,7 +41,7 @@ guess from the first H1 in sexps. Tags specified with
    :scripts scripts
    :rewriter rewriter))
 
-(defun render-sexps-to-stream (sexps out &key title stylesheets scripts rewriter)
+(defun render-sexps-to-stream (sexps out &key title stylesheets scripts (rewriter #'identity))
   "Render `sexps' to `out' with a header made from `title',
 `stylesheets', and `scripts'. If `title' is not supplied, we try to
 guess from the first H1 in sexps."
