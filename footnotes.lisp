@@ -37,15 +37,23 @@
                             (declare (ignore notetag))
                             `((:div :class ,(string-downcase tag))
                               (,ptag
-                               ((:a :name (:format ,note-name-fmt ,num))
-                                ((:a :href (:format ,noteref-href-fmt ,num) :class ,note-number-class)
-                                 ,(princ-to-string num))) " "
-                                 ,@prest)
+                               ((:a :name (:format ,note-name-fmt ,num)) "")
+                               ((:a :href (:format ,noteref-href-fmt ,num) :class ,note-number-class)
+                                ,(princ-to-string num)) " "
+                                ,@prest)
                               ,@nrest)))))))))))
 
-(defun wrap-with-noterefs (body start current noteref-name-fmt)
+#+(or)(defun wrap-with-noterefs (body start current noteref-name-fmt)
   (assert (>= current start))
   (if (= start current)
      body
      `(((:a :name (:format ,noteref-name-fmt ,(1+ start)))
         ,@(wrap-with-noterefs body (1+ start) current noteref-name-fmt)))))
+
+(defun wrap-with-noterefs (body start current noteref-name-fmt)
+  ;; For HTML5 we should use :id instead of :name
+  (assert (>= current start))
+  (if (= start current)
+     body
+     `(((:a :name (:format ,noteref-name-fmt ,(1+ start))) "")
+       ,@(wrap-with-noterefs body (1+ start) current noteref-name-fmt))))
