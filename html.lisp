@@ -75,20 +75,25 @@ guess from the first H1 in sexps."
 (defun remap-tags (sexp mappings)
   (labels ((walker (x)
              (cond
-               ((stringp x) x)
+               ((stringp x) (list x))
                ((consp sexp) (remap-one-tag x mappings #'walker)))))
-    (walker sexp)))
+    (first (walker sexp))))
 
 (defun remap-one-tag (sexp mappings walker-fn)
   (destructuring-bind (tag . content) sexp
-    (let ((mapper (cdr (assoc tag mappings))))
-      (typecase mapper
-        (null `(,tag ,@(mapcar walker-fn content)))
-        (keyword `(,mapper ,@(mapcar walker-fn content)))
-        (cons `(,mapper ,@(mapcar walker-fn content)))
-        ((or symbol function)
-         (multiple-value-bind (mapped recurse) (funcall mapper sexp)
-           (if recurse (funcall walker-fn mapped) mapped)))))))
+    (let ((entry (assoc tag mappings)))
+      (cond
+        ((not entry)
+        `((,tag ,@(mapcan walker-fn content))))
+        (t
+         (let ((mapper (cdr entry)))
+           (typecase mapper
+             (null ())
+             (keyword `((,mapper ,@(mapcan walker-fn content))))
+             (cons `((,mapper ,@(mapcan walker-fn content))))
+             ((or symbol function)
+              (multiple-value-bind (mapped recurse) (funcall mapper sexp)
+                (list (if recurse (funcall walker-fn mapped) mapped)))))))))))
 
 (defun htmlize-links (sexps)
   (multiple-value-bind (sexps links) (extract-link-defs sexps)
