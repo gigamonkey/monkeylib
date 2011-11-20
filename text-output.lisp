@@ -1,8 +1,8 @@
-;;
-;; Copyright (c) 2005, Gigamonkeys Consulting All rights reserved.
-;;
+;;; Copyright (c) 2005-2011, Peter Seibel. All rights reserved.
+;;;
+;;; See COPYING for details.
 
-(in-package :com.gigamonkeys.foo.text-output)
+(in-package :monkeylib-text-output)
 
 (defvar *pretty* t
   "Controls whether output is generated with indentation and
@@ -17,11 +17,11 @@
 
 (defparameter *default-tab-width* 4)
 
-(defmacro with-foo-output ((stream &key (pretty *pretty*)) &body body)
+(defmacro with-text-output ((stream &key (pretty *pretty*)) &body body)
   `(let* ((*text-output* ,stream)
 	  (*text-pretty-printer* nil)
           (*pretty* ,pretty))
-    ,@body))
+     ,@body))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Text output interface -- this interface is implemented in two
@@ -41,7 +41,7 @@
 
 (defgeneric newline (processor)
   (:documentation "Unconditionally emit a newline."))
-  
+
 (defgeneric freshline (processor)
   (:documentation "Emit a newline unless the last character emitted was a newline."))
 
@@ -81,15 +81,15 @@
     (emit-newline (printer pp))))
 
 (defmethod indent ((pp text-pretty-printer))
-  (when *pretty* 
+  (when *pretty*
     (incf (indentation (printer pp)) (tab-width pp))))
 
 (defmethod unindent ((pp text-pretty-printer))
-  (when *pretty* 
+  (when *pretty*
     (decf (indentation (printer pp)) (tab-width pp))))
 
 (defmethod toggle-indenting ((pp text-pretty-printer))
-  (when *pretty* 
+  (when *pretty*
     (with-slots (indenting-p) (printer pp)
       (setf indenting-p (not indenting-p)))))
 
@@ -103,7 +103,7 @@
   (or *text-pretty-printer* (new-pretty-printer)))
 
 (defun new-pretty-printer ()
-  (make-instance 
+  (make-instance
     'text-pretty-printer
     :printer (make-instance 'indenting-printer :out *text-output*)))
 
@@ -118,7 +118,7 @@
 
 (defmethod newline ((compiler text-compiler))
   (push-op '(:newline) (ops compiler)))
-  
+
 (defmethod freshline ((compiler text-compiler))
   (push-op '(:freshline) (ops compiler)))
 
@@ -150,7 +150,7 @@
 (defun optimize-static-output (ops)
   (let ((new-ops (make-op-buffer)))
     (with-output-to-string (buf)
-      (flet ((add-op (op) 
+      (flet ((add-op (op)
                (compile-buffer buf new-ops)
                (push-op op new-ops)))
         (loop for op across ops do
@@ -183,26 +183,31 @@
       `(write-sequence ,string *text-output*))))
 
 (defmethod op->code ((op (eql :newline)) &rest operands)
+  (assert (null operands))
   (if *pretty*
     `(newline *text-pretty-printer*)
-    `(write-char #\Newline *text-output*)))    
+    `(write-char #\Newline *text-output*)))
 
 (defmethod op->code ((op (eql :freshline)) &rest operands)
+  (assert (null operands))
   (if *pretty*
     `(freshline *text-pretty-printer*)
     (error "Bad op when not pretty-printing: ~a" op)))
 
 (defmethod op->code ((op (eql :indent)) &rest operands)
+  (assert (null operands))
   (if *pretty*
     `(indent *text-pretty-printer*)
     (error "Bad op when not pretty-printing: ~a" op)))
 
 (defmethod op->code ((op (eql :unindent)) &rest operands)
+  (assert (null operands))
   (if *pretty*
     `(unindent *text-pretty-printer*)
     (error "Bad op when not pretty-printing: ~a" op)))
 
 (defmethod op->code ((op (eql :toggle-indenting)) &rest operands)
+  (assert (null operands))
   (if *pretty*
     `(toggle-indenting *text-pretty-printer*)
     (error "Bad op when not pretty-printing: ~a" op)))
