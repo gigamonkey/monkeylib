@@ -3,6 +3,7 @@
 ;;
 
 (defsystem com.gigamonkeys.statistics
+  :description "Some basic statistics-computing functions."
   :components
   ((:file "packages")
    (:file "statistics" :depends-on ("packages"))))
