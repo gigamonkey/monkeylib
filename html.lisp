@@ -2,7 +2,7 @@
 
 (defparameter *default-subdocument-tags* '(:note :comment))
 
-(defun render (file &key 
+(defun render (file &key
                title
                stylesheets
                scripts
@@ -24,10 +24,10 @@ guess from the first H1 in sexps. Tags specified with
      :rewriter rewriter)))
 
 (defun render-to-stream (file out &key
-                         title 
+                         title
                          stylesheets
                          scripts
-                         (links t) 
+                         (links t)
                          (subdocument-tags *default-subdocument-tags*)
                          (rewriter #'identity))
   "Render `file' to the stream `out' with a header made from `title',
@@ -75,7 +75,10 @@ guess from the first H1 in sexps."
 (defun remap-tags (sexp mappings)
   (labels ((walker (x)
              (cond
+               ((numberp x) (list x))
                ((stringp x) (list x))
+               ;; FIXME: should this be x or sexp. If the latter,
+               ;; comment to explain why.
                ((consp sexp) (remap-one-tag x mappings #'walker)))))
     (first (walker sexp))))
 
@@ -98,7 +101,7 @@ guess from the first H1 in sexps."
 (defun htmlize-links (sexps)
   (multiple-value-bind (sexps links) (extract-link-defs sexps)
     (rewrite-links sexps links)))
-    
+
 (defun extract-link-defs (sexp)
   (let ((links (make-hash-table :test #'equalp))
         (strip (gensym)))
@@ -137,4 +140,3 @@ guess from the first H1 in sexps."
    (progn
      (warn "No link definition for ~a" key)
      "nowhere.html")))
-

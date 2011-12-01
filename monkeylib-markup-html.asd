@@ -1,9 +1,9 @@
-;;
-;; Copyright (c) 2010, Peter Seibel. All rights reserved.
-;;
+;;; Copyright (c) 2010-2011, Peter Seibel.
+;;; All rights reserved. See COPYING for details.
 
 (defsystem monkeylib-markup-html
   :name "monkeylib-markup-html"
+  :description "Library for generating HTML from Markup formatted text."
   :components
   ((:file "packages")
    (:file "html" :depends-on ("packages"))
