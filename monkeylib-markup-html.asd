@@ -14,4 +14,4 @@
    :alexandria
    :com.gigamonkeys.markup
    :com.gigamonkeys.utilities
-   :com.gigamonkeys.foo))
+   :monkeylib-html))

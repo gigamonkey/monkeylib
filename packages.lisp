@@ -7,8 +7,7 @@
 (defpackage :com.gigamonkeys.markup.html
   (:use :common-lisp
         :com.gigamonkeys.markup
-        :com.gigamonkeys.utilities
-        :com.gigamonkeys.foo)
+        :com.gigamonkeys.utilities)
   (:import-from :alexandria :compose)
   (:export
    :render
