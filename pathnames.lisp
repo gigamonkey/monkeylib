@@ -19,22 +19,22 @@ names a directory. It can be in either file or directory form."
     ;; SBCL, CMUCL, and Lispworks return subdirectories in directory
     ;; form just the way we want.
     (directory wildcard)
-    
+
     #+openmcl
     ;; OpenMCl by default doesn't return subdirectories at all. But
     ;; when prodded to do so with the special argument :directories,
     ;; it returns them in directory form.
     (directory wildcard :directories t)
-            
+
     #+allegro
     ;; Allegro normally return directories in file form but we can
     ;; change that with the :directories-are-files argument.
     (directory wildcard :directories-are-files nil)
-            
+
     #+clisp
     ;; CLISP has a particularly idiosyncratic view of things. But we
     ;; can bludgeon even it into doing what we want.
-    (nconc 
+    (nconc
      ;; CLISP won't list files without an extension when :type is
      ;; wild so we make a special wildcard for it.
      (directory wildcard)
@@ -100,7 +100,7 @@ in `directory normal form'. Returns truename which will be in
     (error "file-exists-p not implemented"))
 
 (defun directory-wildcard (dirname)
-  (make-pathname 
+  (make-pathname
    :name :wild
    :type #-clisp :wild #+clisp nil
    :defaults (pathname-as-directory dirname)))
@@ -122,7 +122,7 @@ in the file system since they always return names in `directory normal
 form'."
   (flet ((component-present-p (value)
            (and value (not (eql value :unspecific)))))
-    (and 
+    (and
      (not (component-present-p (pathname-name p)))
      (not (component-present-p (pathname-type p)))
      p)))
@@ -143,7 +143,7 @@ component. Returns its argument if name and type are both nil or
     (when (wild-pathname-p pathname)
       (error "Can't reliably convert wild pathnames."))
     (if (not (directory-pathname-p name))
-      (make-pathname 
+      (make-pathname
        :directory (append (or (pathname-directory pathname) (list :relative))
                           (list (file-namestring pathname)))
        :name      nil
@@ -163,7 +163,7 @@ it is already in file form."
     (if (directory-pathname-p name)
       (let* ((directory (pathname-directory pathname))
              (name-and-type (pathname (first (last directory)))))
-        (make-pathname 
+        (make-pathname
          :directory (butlast directory)
          :name (pathname-name name-and-type)
          :type (pathname-type name-and-type)
@@ -195,4 +195,6 @@ pathnames as well."
   (let ((truename (file-exists-p name)))
     (and truename (file-pathname-p name))))
 
-
+(defun parent-directory (pathname)
+  "Return the pathname of the directory containing pathname."
+  (make-pathname :name nil :type nil :defaults (pathname-as-file pathname)))

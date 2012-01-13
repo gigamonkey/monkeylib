@@ -15,4 +15,5 @@
    :pathname-as-file
    :walk-directory
    :directory-p
-   :file-p))
+   :file-p
+   :parent-directory))
