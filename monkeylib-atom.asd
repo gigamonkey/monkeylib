@@ -6,13 +6,12 @@
   :author "Peter Seibel <peter@gigamonkeys.com>"
   :licence "BSD"
   :description "ATOM feed generation"
-  :components
-  ((:file "packages")
-   (:file "atom" :depends-on ("packages"))
-   (:file "feed" :depends-on ("packages" "atom")))
-  :depends-on (:com.gigamonkeys.macro-utilities
-	       :com.gigamonkeys.pathnames
-	       :com.gigamonkeys.utilities
+  :depends-on (:com.gigamonkeys.pathnames
+               :com.gigamonkeys.utilities
+               :com.gigamonkeys.markup
                :monkeylib-html
                :monkeylib-text-output
-               :monkeylib-text-languages))
+               :monkeylib-text-languages)
+  :components ((:file "packages")
+               (:file "atom" :depends-on ("packages"))
+               (:file "feed" :depends-on ("packages" "atom"))))

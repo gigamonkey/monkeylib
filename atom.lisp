@@ -11,27 +11,27 @@
    :category))
 
 (defclass feed ()
-  ((title :initarg :title :accessor title)
-   (subtitle :initarg :subtitle :accessor subtitle)
-   (updated :initarg :updated :accessor updated)
-   (tag :initarg :tag :accessor tag)
-   (feed-url :initarg :feed-url :accessor feed-url)
-   (index-url :initarg :index-url :accessor index-url)
-   (rights :initarg :rights :accessor rights)
-   (default-author-name :initarg :default-author-name :accessor default-author-name)
+  ((title                :initarg :title                :accessor title)
+   (subtitle             :initarg :subtitle             :accessor subtitle)
+   (updated              :initarg :updated              :accessor updated)
+   (tag                  :initarg :tag                  :accessor tag)
+   (feed-url             :initarg :feed-url             :accessor feed-url)
+   (index-url            :initarg :index-url            :accessor index-url)
+   (rights               :initarg :rights               :accessor rights)
+   (default-author-name  :initarg :default-author-name  :accessor default-author-name)
    (default-author-email :initarg :default-author-email :accessor default-author-email)
-   (default-author-uri :initarg :default-author-uri :accessor default-author-uri)
-   (canonical-host :initarg :canonical-host :accessor canonical-host)
-   (full-prefix :initarg :full-prefix :accessor full-prefix)
-   (entries :initarg :entries :accessor entries)))
+   (default-author-uri   :initarg :default-author-uri   :accessor default-author-uri)
+   (canonical-host       :initarg :canonical-host       :accessor canonical-host)
+   (full-prefix          :initarg :full-prefix          :accessor full-prefix)
+   (entries              :initarg :entries              :accessor entries)))
 
 (defclass entry ()
-  ((file :initarg :file :accessor file)
-   (title :initarg :title :accessor title)
-   (body :initarg :body :accessor body)
-   (published :initarg :published :accessor published)
-   (updated :initarg :updated :accessor updated)
-   (categories :initarg :categories :accessor categories)))
+  ((file                 :initarg :file                 :accessor file)
+   (title                :initarg :title                :accessor title)
+   (body                 :initarg :body                 :accessor body)
+   (published            :initarg :published            :accessor published)
+   (updated              :initarg :updated              :accessor updated)
+   (categories           :initarg :categories           :accessor categories)))
 
 (defun feed (feed)
   (with-slots (title subtitle updated tag feed-url index-url rights entries) feed
@@ -74,7 +74,7 @@
   (format nil "http://~a~a~a" canonical-host prefix (permalink name year month date)))
 
 (defun permalink (name year month date)
-  (format nil "~4,'0d/~2,'0d/~2,'0d/~a.html" year month date name))
+  (format nil "~4,'0d/~2,'0d/~2,'0d/~a" year month date name))
 
 (defun timestamp (utc)
   (format-iso-8601-time utc :time-zone 0))
@@ -83,4 +83,4 @@
   "Generate a tag: URL as described in
 http://www.taguri.org/07/draft-kindberg-tag-uri-07.html"
   (format nil "tag:~a,~4,'0d~@[-~2,'0d~]~@[-~2,'0d~]:~a~@[#~a~]"
-	  authority-name year month date specific fragment))
+          authority-name year month date specific fragment))
