@@ -18,7 +18,7 @@
 ;; USA
 ;;
 
-(in-package :com.gigamonkeys.java-lexer)
+(in-package :monkeylib-java-lexer)
 
 ;; 3.3 Unicode Escapes
 

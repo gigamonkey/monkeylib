@@ -1,4 +1,4 @@
-(in-package :com.gigamonkeys.css)
+(in-package :monkeylib-css)
 
 ;; %option case-insensitive
 

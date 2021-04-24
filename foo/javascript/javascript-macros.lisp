@@ -2,7 +2,7 @@
 ;; Copyright (c) 2005, Gigamonkeys Consulting All rights reserved.
 ;;
 
-(in-package :com.gigamonkeys.foo.javascript)
+(in-package :monkeylib-foo.javascript)
 
 (defvar *counter* 0)
 

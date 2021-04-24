@@ -5,9 +5,9 @@
 
 (defpackage :monkeylib-atom
   (:use :common-lisp
-        :com.gigamonkeys.utilities
-        :com.gigamonkeys.pathnames
-        :com.gigamonkeys.markup
+        :monkeylib-utilities
+        :monkeylib-pathnames
+        :monkeylib-markup
         :monkeylib-html
         :monkeylib-text-output
         :monkeylib-text-languages)

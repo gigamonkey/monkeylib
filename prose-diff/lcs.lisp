@@ -1,4 +1,4 @@
-(in-package :com.gigamonkeys.prose-diff)
+(in-package :monkeylib-prose-diff)
 
 (defun lcs (a b)
   "Compute the longest common subsequence of vectors `a' and `b'"

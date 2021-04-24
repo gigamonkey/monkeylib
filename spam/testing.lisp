@@ -1,4 +1,4 @@
-(in-package :com.gigamonkeys.spam)
+(in-package :monkeylib-spam)
 
 (defparameter *max-chars* (* 10 1024))
 (defparameter *corpus* (make-array 1000 :adjustable t :fill-pointer 0))

@@ -1,4 +1,4 @@
-(in-package :com.gigamonkeys.markup.html)
+(in-package :monkeylib-markup.html)
 
 (defparameter *default-subdocument-tags* '(:note :comment))
 

@@ -4,9 +4,9 @@
 
 (defpackage :monkeylib-html
   (:use :common-lisp
-        :com.gigamonkeys.utilities
-        :com.gigamonkeys.test
-        :com.gigamonkeys.pathnames
+        :monkeylib-utilities
+        :monkeylib-test
+        :monkeylib-pathnames
         :monkeylib-text-output
         :monkeylib-text-languages)
   (:export

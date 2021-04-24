@@ -1,4 +1,4 @@
-(in-package :com.gigamonkeys.spam)
+(in-package :monkeylib-spam)
 
 (defparameter *default-ham-threshold* .4d0)
 (defparameter *default-spam-threshold* .6d0)

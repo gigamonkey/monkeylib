@@ -2,7 +2,7 @@
 ;; Copyright (c) 2005-2007, Gigamonkeys Consulting All rights reserved.
 ;;
 
-(in-package :com.gigamonkeys.foo.xml)
+(in-package :monkeylib-foo.xml)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Public API

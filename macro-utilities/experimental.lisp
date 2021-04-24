@@ -1,4 +1,4 @@
-(in-package :com.gigamonkeys.macro-utilities)
+(in-package :monkeylib-macro-utilities)
 
 ;;; Experimental macros. Not exported.
 

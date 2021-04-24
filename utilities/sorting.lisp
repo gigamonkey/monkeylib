@@ -1,4 +1,4 @@
-(in-package :com.gigamonkeys.utilities)
+(in-package :monkeylib-utilities)
 
 (defun keyed-sort (sequence predicate key)
   "Sort `sequence' using `predicate' applied to the result of applying

@@ -1,4 +1,4 @@
-(in-package :com.gigamonkeys.utilities)
+(in-package :monkeylib-utilities)
 
 (defun mklist (x)
   "`x' if it is a list, otherwise a singleton list containing `x'."

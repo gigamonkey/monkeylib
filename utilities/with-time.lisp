@@ -2,7 +2,7 @@
 ;; Copyright (c) 2005, Gigamonkeys Consulting All rights reserved.
 ;;
 
-(in-package :com.gigamonkeys.utilities)
+(in-package :monkeylib-utilities)
 
 ;; Note these are the offsets as the rest of the world (e.g. ISO-8601)
 ;; thinks of them. The time-zone argument to DECODE-UNIVERSAL-TIME is

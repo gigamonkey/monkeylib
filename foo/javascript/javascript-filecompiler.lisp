@@ -2,12 +2,12 @@
 ;; Copyright (c) 2005, Gigamonkeys Consulting All rights reserved.
 ;;
 
-(in-package :com.gigamonkeys.foo.javascript)
+(in-package :monkeylib-foo.javascript)
 
 (defmacro define-javascript-module (name &body names)
   `(setf (get ',name 'javascript-module) ',names))
 
-(define-javascript-module com.gigamonkeys.foo.javascript.special-ops
+(define-javascript-module monkeylib-foo.javascript.special-ops
   array object @ ref new ++ -- ? progn prog block var if
   do-while while for continue break return with switch label
   throw try function
@@ -17,7 +17,7 @@
   * / % + - << >> >>> < > <= >= instanceof in
   == != === !=== & ^ \| && \|\|)
 
-(define-javascript-module com.gigamonkeys.foo.javascript.built-in-macros
+(define-javascript-module monkeylib-foo.javascript.built-in-macros
   defun defmethod defvar debug lambda let let* if when unless cond case switch
   dolist dotimes dokids return array autoref autorefset setf defcallback
   destructure html define-builder)
@@ -29,7 +29,7 @@
     (add-mapping sym mappings)))
 
 (defun add-mapping (symbol mappings)
-  (let ((name (intern (string-downcase symbol) :com.gigamonkeys.foo.javascript.tokens)))
+  (let ((name (intern (string-downcase symbol) :monkeylib-foo.javascript.tokens)))
     (let ((existing (gethash name mappings)))
       (if existing 
 	(unless (eql existing symbol)
@@ -38,8 +38,8 @@
   
 (defparameter *default-initial-mappings* (make-hash-table))
 (progn
-  (add-mappings *default-initial-mappings* 'com.gigamonkeys.foo.javascript.special-ops)
-  (add-mappings *default-initial-mappings* 'com.gigamonkeys.foo.javascript.built-in-macros))
+  (add-mappings *default-initial-mappings* 'monkeylib-foo.javascript.special-ops)
+  (add-mappings *default-initial-mappings* 'monkeylib-foo.javascript.built-in-macros))
 
 (defun resolve-names (thing mappings)
   (cond
@@ -53,7 +53,7 @@
 
 (defmacro with-javascript-input (&body body)
   `(let ((*readtable* (copy-readtable))
-	 (*package* (find-package :com.gigamonkeys.foo.javascript.tokens))
+	 (*package* (find-package :monkeylib-foo.javascript.tokens))
 	 (*mappings* (make-hash-table)))
      (maphash #'(lambda (k v) (setf (gethash k *mappings*) v)) *default-initial-mappings*)
      (setf (readtable-case *readtable*) :preserve)

@@ -4,7 +4,7 @@
 
 (in-package :cl-user)
 
-(defpackage :com.gigamonkeys.pathnames
+(defpackage :monkeylib-pathnames
   (:use :common-lisp)
   (:export
    :list-directory

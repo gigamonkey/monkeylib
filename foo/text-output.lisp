@@ -2,7 +2,7 @@
 ;; Copyright (c) 2005, Gigamonkeys Consulting All rights reserved.
 ;;
 
-(in-package :com.gigamonkeys.foo.text-output)
+(in-package :monkeylib-foo.text-output)
 
 (defvar *pretty* t
   "Controls whether output is generated with indentation and

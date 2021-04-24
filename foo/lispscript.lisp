@@ -13,15 +13,15 @@
 ;;; will return someobject rather than the Foo object which is 'this'
 ;;; in a-method. Blech.
 
-(in-package :com.gigamonkeys.foo.lispscript)
+(in-package :monkeylib-foo.lispscript)
 
 (defclass lispscript (javascript)
   ()
   (:default-initargs
-    :input-package (find-package :com.gigamonkeys.foo.lispscript)))
+    :input-package (find-package :monkeylib-foo.lispscript)))
 
 (defparameter *lispscript* (make-instance 'lispscript))
-(defparameter *html* (make-instance 'com.gigamonkeys.foo.xml::html))
+(defparameter *html* (make-instance 'monkeylib-foo.xml::html))
 
 
 ;;; Compilation environment
@@ -31,7 +31,7 @@
 
 (defun needs-value (env)
   (or (cdr (assoc 'needs-value env))
-      (eql (com.gigamonkeys.foo.javascript::statement-or-expression env) :expression)))
+      (eql (monkeylib-foo.javascript::statement-or-expression env) :expression)))
 
 (defun find-open-block (name env &key (expected t))
   (let ((cons (assoc `(open-block ,name) env :test #'equal)))
@@ -354,7 +354,7 @@ don't need to set up all the machinery for returning."
 
 ;; Assignment
 
-(define-javascript-macro |set| (form value) `(com.gigamonkeys.foo.javascript:= ,form ,value))
+(define-javascript-macro |set| (form value) `(monkeylib-foo.javascript:= ,form ,value))
 
 (define-javascript-macro |debug| (&rest stuff) `(|alert| (+ ,@stuff)))
 
@@ -375,7 +375,7 @@ don't need to set up all the machinery for returning."
     (symbol thing)))
 
 (define-javascript-macro |xml| (body)
-  (multiple-value-bind (tag attributes body) (com.gigamonkeys.foo.xml::parse-cons-form body)
+  (multiple-value-bind (tag attributes body) (monkeylib-foo.xml::parse-cons-form body)
     `(|let*| ((document (|.createDocument| (@ |document| |implementation|) "" ,(case-convert-tag tag) |null|)))
 	     ,@(loop for (name value) on attributes by #'cddr
 		  collect `(|.setAttribute| (@ document |document-element|) ,(case-convert-tag name) ,(attribute-value value)))
@@ -393,7 +393,7 @@ don't need to set up all the machinery for returning."
     (cons 
      (cond
        ((sexp-form-p *html* body)
-	(multiple-value-bind (tag attributes body) (com.gigamonkeys.foo.xml::parse-cons-form body)
+	(multiple-value-bind (tag attributes body) (monkeylib-foo.xml::parse-cons-form body)
 	  `(|let*| ((element (|.create-element| ,document ,(case-convert-tag tag))))
 		   ,@(loop for (name value) on attributes by #'cddr
 			collect `(|.setAttribute| element ,(case-convert-tag name) ,(attribute-value value)))
@@ -412,7 +412,7 @@ don't need to set up all the machinery for returning."
     (cons 
      (cond
        ((sexp-form-p *html* body)
-	(multiple-value-bind (tag attributes body) (com.gigamonkeys.foo.xml::parse-cons-form body)
+	(multiple-value-bind (tag attributes body) (monkeylib-foo.xml::parse-cons-form body)
 	  `(|let*| ((element (|.create-element| ,document ,(string tag))))
 		   ,@(loop for (name value) on attributes by #'cddr
 			collect `(|.setAttribute| element ,(string name) ,(attribute-value value)))
@@ -431,7 +431,7 @@ don't need to set up all the machinery for returning."
     (cons 
      (cond
        ((sexp-form-p *html* body)
-	(multiple-value-bind (tag attributes body) (com.gigamonkeys.foo.xml::parse-cons-form body)
+	(multiple-value-bind (tag attributes body) (monkeylib-foo.xml::parse-cons-form body)
 	  `(|let*| ((element (|.create-elementNS| ,document ,(string tag))))
 		   ,@(loop for (name value) on attributes by #'cddr
 			collect `(|.setAttribute| element ,(string name) ,(attribute-value value)))
@@ -455,7 +455,7 @@ don't need to set up all the machinery for returning."
       (cons 
        (cond
 	 ((sexp-form-p *html* body)
-	  (multiple-value-bind (tag attributes body) (com.gigamonkeys.foo.xml::parse-cons-form body)
+	  (multiple-value-bind (tag attributes body) (monkeylib-foo.xml::parse-cons-form body)
 	    `(|let*| ((element (|.create-element| |document| ,(case-convert-tag tag))))
 		     ,@(loop for (name value) on attributes by #'cddr
 			  collect `(|.set-attribute| element ,(case-convert-tag name) ,(attribute-value value)))

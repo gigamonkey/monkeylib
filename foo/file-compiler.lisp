@@ -1,4 +1,4 @@
-(in-package :com.gigamonkeys.foo)
+(in-package :monkeylib-foo)
 
 (defun generate-from-file (language input &optional output)
   (unless output

@@ -1,4 +1,4 @@
-(in-package :com.gigamonkeys.parser.dot-parser)
+(in-package :monkeylib-parser.dot-parser)
 
 #|
 

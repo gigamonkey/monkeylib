@@ -1,7 +1,7 @@
-(in-package :com.gigamonkeys.prose-diff)
+(in-package :monkeylib-prose-diff)
 
 ;;; Bits of utility code that perhaps should be moved into
-;;; com.gigamonkeys.utilities or replaced with calls to equivalent
+;;; monkeylib-utilities or replaced with calls to equivalent
 ;;; bits o fsome standard utility library.
 
 (defun maximum (list &key (key #'identity))

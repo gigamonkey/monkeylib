@@ -1,4 +1,4 @@
-(in-package :com.gigamonkeys.utilities)
+(in-package :monkeylib-utilities)
 
 (defun nshuffle-vector (vector)
   "Shuffle a vector in place using Fisher-Yates algorithm." 

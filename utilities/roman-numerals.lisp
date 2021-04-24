@@ -1,4 +1,4 @@
-(in-package :com.gigamonkeys.utilities)
+(in-package :monkeylib-utilities)
 
 (defun parse-roman-numeral (symbol-or-string)
   (let ((roman-numerals 

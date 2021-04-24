@@ -1,4 +1,4 @@
-(in-package :com.gigamonkeys.utilities)
+(in-package :monkeylib-utilities)
 
 (defconstant +block-size+ (expt 2 12))
 

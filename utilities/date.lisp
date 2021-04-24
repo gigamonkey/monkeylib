@@ -1,4 +1,4 @@
-(in-package :com.gigamonkeys.utilities)
+(in-package :monkeylib-utilities)
 
 ;;; This file provides an API for manipulating dates (N.B. just dates,
 ;;; not dates and times). The API is, I hope, reasonable. The

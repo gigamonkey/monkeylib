@@ -2,7 +2,7 @@
 ;; Copyright (c) 2005, Gigamonkeys Consulting All rights reserved.
 ;;
 
-(in-package :com.gigamonkeys.foo.lispscript-tests)
+(in-package :monkeylib-foo.lispscript-tests)
 
 (defparameter *to-trim* (list #\Space #\Newline))
 

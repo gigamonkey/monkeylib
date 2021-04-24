@@ -4,13 +4,13 @@
 
 (in-package :cl-user)
 
-(defpackage :com.gigamonkeys.prose-diff
+(defpackage :monkeylib-prose-diff
   (:use :common-lisp
         :cl-ppcre
-        :com.gigamonkeys.pathnames
-        :com.gigamonkeys.utilities
-        :com.gigamonkeys.markup
-        :com.gigamonkeys.markup.html)
+        :monkeylib-pathnames
+        :monkeylib-utilities
+        :monkeylib-markup
+        :monkeylib-markup.html)
   (:import-from :alexandria :compose)
   (:export
    :show-cuts))

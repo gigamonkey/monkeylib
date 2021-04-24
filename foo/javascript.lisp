@@ -2,7 +2,7 @@
 ;; Copyright (c) 2005, Gigamonkeys Consulting All rights reserved.
 ;;
 
-(in-package :com.gigamonkeys.foo.javascript)
+(in-package :monkeylib-foo.javascript)
 
 (defclass javascript (language)
   ()
@@ -10,7 +10,7 @@
    :special-operator-symbol 'javascript-special-operator
     :macro-symbol 'javascript-macro
     :input-readtable (case-preserving-readtable)
-    :input-package (find-package :com.gigamonkeys.foo.javascript)
+    :input-package (find-package :monkeylib-foo.javascript)
     :output-file-type "js"))
 
 (defun new-env (key value env)
@@ -396,19 +396,19 @@ statements such as blocks to *not* emit a semicolon."
 
 ;; Bit of a hack to help out Lispscript generation.
 (defun redundant-apply-p (expr)
-  (and (consp expr) (eql (car expr) 'com.gigamonkeys.foo.lispscript::|.apply|)
+  (and (consp expr) (eql (car expr) 'monkeylib-foo.lispscript::|.apply|)
        (destructuring-bind (name function this &optional args) expr
 	 (declare (ignore name function))
 	 (and 
-	  (eql this 'com.gigamonkeys.foo.lispscript::|this|)
+	  (eql this 'monkeylib-foo.lispscript::|this|)
 	  (equal args '(array))))))
 
 (defun redundant-call-p (expr)
-  (and (consp expr) (eql (car expr) 'com.gigamonkeys.foo.lispscript::|.call|)
+  (and (consp expr) (eql (car expr) 'monkeylib-foo.lispscript::|.call|)
        (destructuring-bind (name function this &rest args) expr
 	 (declare (ignore name function))
 	 (and 
-	  (eql this 'com.gigamonkeys.foo.lispscript::|this|)
+	  (eql this 'monkeylib-foo.lispscript::|this|)
 	  (null args)))))
 
 ;; With

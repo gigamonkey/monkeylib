@@ -1,4 +1,4 @@
-(in-package :com.gigamonkeys.statistics)
+(in-package :monkeylib-statistics)
 
 (defun mean (numbers)
   (let ((length (length numbers)))

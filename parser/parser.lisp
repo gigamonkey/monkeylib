@@ -6,7 +6,7 @@
 ;;; they're too much of a hassle.
 ;;;
 
-(in-package :com.gigamonkeys.parser)
+(in-package :monkeylib-parser)
 
 (defvar *productions* (make-hash-table :test #'eql))
 

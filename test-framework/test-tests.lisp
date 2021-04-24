@@ -1,6 +1,6 @@
-(in-package :com.gigamonkeys.test-tests)
+(in-package :monkeylib-test-tests)
 
-(com.gigamonkeys.test:clear-package-tests)
+(monkeylib-test:clear-package-tests)
 
 (define-condition foo-condition () ())
 (define-condition foo-error (error) ())

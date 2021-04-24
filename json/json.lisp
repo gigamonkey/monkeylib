@@ -1,4 +1,4 @@
-(in-package :com.gigamonkeys.json)
+(in-package :monkeylib-json)
 
 ;;; JSON-EXPS:
 ;;;

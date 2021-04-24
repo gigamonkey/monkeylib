@@ -4,9 +4,9 @@
 
 (in-package :cl-user)
 
-(defpackage :com.gigamonkeys.markup.xml
+(defpackage :monkeylib-markup.xml
   (:use :common-lisp
-        :com.gigamonkeys.markup
-        :com.gigamonkeys.utilities
-        :com.gigamonkeys.foo
-        :com.gigamonkeys.foo.xml))
+        :monkeylib-markup
+        :monkeylib-utilities
+        :monkeylib-foo
+        :monkeylib-foo.xml))

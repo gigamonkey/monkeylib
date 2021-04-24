@@ -1,4 +1,4 @@
-(in-package :com.gigamonkeys.prose-diff)
+(in-package :monkeylib-prose-diff)
 
 ;;;
 ;;; Code for splitting chunks into parts corresponding to a bunch of

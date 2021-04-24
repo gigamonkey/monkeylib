@@ -4,8 +4,8 @@
 
 (in-package :cl-user)
 
-(defpackage :com.gigamonkeys.test
-  (:use :common-lisp :com.gigamonkeys.macro-utilities)
+(defpackage :monkeylib-test
+  (:use :common-lisp :monkeylib-macro-utilities)
   (:export :deftest
 	   :check
 	   :expect
@@ -17,6 +17,6 @@
 	   :*debug*
 	   :*debug-on-fail*))
 
-(defpackage :com.gigamonkeys.test-tests
+(defpackage :monkeylib-test-tests
   (:use :common-lisp)
-  (:import-from :com.gigamonkeys.test :deftest :check :test :expect))
+  (:import-from :monkeylib-test :deftest :check :test :expect))

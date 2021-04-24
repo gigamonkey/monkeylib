@@ -1,4 +1,4 @@
-(in-package :com.gigamonkeys.markup.html.handy-tags)
+(in-package :monkeylib-markup.html.handy-tags)
 
 ;;;
 ;;; FIXME: Some of this stuff should be moved out of monkeylib as it's

@@ -31,13 +31,10 @@
   CL-USER> (test foo)
 
   ;; Another way
-  CL-USER> (test #'foo) 
+  CL-USER> (test #'foo)
 
   ;; Run a test function with arguments.
   CL-USER> (test bar 10)
 
   ;; run all the tests associated with a package
-  CL-USER> (test-package :com.gigamonkeys.the-package)
-
-
-
+  CL-USER> (test-package :the-package)

@@ -4,7 +4,7 @@
 
 (in-package :cl-user)
 
-(defpackage :com.gigamonkeys.utilities
+(defpackage :monkeylib-utilities
   (:use :cl :split-sequence :alexandria)
   ;; These are also defined in alexandria. At some point should use
   ;; theirs but they aren't exactly the same so that requires finding

@@ -4,7 +4,7 @@
 
 (in-package :cl-user)
 
-(defpackage :com.gigamonkeys.foo.text-output
+(defpackage :monkeylib-foo.text-output
   (:use :cl)
   (:export
    :*pretty*
@@ -24,10 +24,10 @@
    :unindent
    :with-foo-output))
 
-(defpackage :com.gigamonkeys.foo.language
+(defpackage :monkeylib-foo.language
   (:use :cl
-        :com.gigamonkeys.utilities
-        :com.gigamonkeys.foo.text-output)
+        :monkeylib-utilities
+        :monkeylib-foo.text-output)
   (:export
    :case-preserving-readtable
    :comment
@@ -61,13 +61,13 @@
    :special-operator-symbol
    :top-level-environment))
 
-(defpackage :com.gigamonkeys.foo.xml
+(defpackage :monkeylib-foo.xml
   (:use :common-lisp
-        :com.gigamonkeys.utilities
-        :com.gigamonkeys.foo.text-output
-        :com.gigamonkeys.foo.language
-        :com.gigamonkeys.test
-        :com.gigamonkeys.pathnames)
+        :monkeylib-utilities
+        :monkeylib-foo.text-output
+        :monkeylib-foo.language
+        :monkeylib-test
+        :monkeylib-pathnames)
   (:export
    :&attributes
    :cons-form-p
@@ -85,22 +85,22 @@
    :xhtml
    :xml))
 
-(defpackage :com.gigamonkeys.foo.css
+(defpackage :monkeylib-foo.css
   (:use :common-lisp
-        :com.gigamonkeys.utilities
-        :com.gigamonkeys.foo.text-output
-        :com.gigamonkeys.foo.language)
+        :monkeylib-utilities
+        :monkeylib-foo.text-output
+        :monkeylib-foo.language)
   (:export
    :emit-css
    :css))
 
-(defpackage :com.gigamonkeys.foo
+(defpackage :monkeylib-foo
   (:use :common-lisp
-        :com.gigamonkeys.foo.xml
-        :com.gigamonkeys.foo.css
-        :com.gigamonkeys.utilities
-        :com.gigamonkeys.foo.text-output
-        :com.gigamonkeys.foo.language)
+        :monkeylib-foo.xml
+        :monkeylib-foo.css
+        :monkeylib-utilities
+        :monkeylib-foo.text-output
+        :monkeylib-foo.language)
   (:export
    :&attributes
    :compile-javascript
@@ -130,12 +130,12 @@
    :with-html-to-file
    :xml))
 
-(defpackage com.gigamonkeys.foo.javascript
+(defpackage monkeylib-foo.javascript
   (:use :common-lisp
-        :com.gigamonkeys.foo
-        :com.gigamonkeys.utilities
-        :com.gigamonkeys.foo.text-output
-        :com.gigamonkeys.foo.language)
+        :monkeylib-foo
+        :monkeylib-utilities
+        :monkeylib-foo.text-output
+        :monkeylib-foo.language)
   (:export
    :javascript
    :define-javascript-macro
@@ -215,19 +215,19 @@
    :with))
 
 
-(defpackage com.gigamonkeys.foo.lispscript
+(defpackage monkeylib-foo.lispscript
   (:use :common-lisp
-        :com.gigamonkeys.foo.language
-        :com.gigamonkeys.foo.javascript)
+        :monkeylib-foo.language
+        :monkeylib-foo.javascript)
   (:shadow :=)
   (:export :*lispscript*))
 
 
-(defpackage com.gigamonkeys.foo.lispscript-tests
+(defpackage monkeylib-foo.lispscript-tests
   (:use :common-lisp
-        :com.gigamonkeys.foo
-        :com.gigamonkeys.foo.xml
-        :com.gigamonkeys.foo.javascript
-        :com.gigamonkeys.foo.lispscript))
+        :monkeylib-foo
+        :monkeylib-foo.xml
+        :monkeylib-foo.javascript
+        :monkeylib-foo.lispscript))
 
-(defpackage com.gigamonkeys.foo.javascript.tokens (:use))
+(defpackage monkeylib-foo.javascript.tokens (:use))

@@ -1,4 +1,4 @@
-(in-package :com.gigamonkeys.prose-diff)
+(in-package :monkeylib-prose-diff)
 
 (defparameter *short-length* 5)
 

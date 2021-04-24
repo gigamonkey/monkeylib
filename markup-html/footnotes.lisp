@@ -1,4 +1,4 @@
-(in-package :com.gigamonkeys.markup.html)
+(in-package :monkeylib-markup.html)
 
 (defun footnotes (tag sexp &key (number-format "~d"))
   (let ((note-num 0)

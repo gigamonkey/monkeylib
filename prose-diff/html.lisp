@@ -1,4 +1,4 @@
-(in-package :com.gigamonkeys.prose-diff)
+(in-package :monkeylib-prose-diff)
 
 ;;;
 ;;; HTML generation -- given two Markup files generate an HTML file of the diff.

@@ -4,7 +4,7 @@
 
 (in-package :cl-user)
 
-(defpackage :com.gigamonkeys.binary-data
+(defpackage :monkeylib-binary-data
   (:use :common-lisp :alexandria)
   (:nicknames :binary-data)
   (:export :define-binary-class
@@ -19,8 +19,8 @@
            :current-binary-object
            :+null+))
 
-(defpackage :com.gigamonkeys.binary-data.common-datatypes
-  (:use :common-lisp :com.gigamonkeys.binary-data)
+(defpackage :monkeylib-binary-data.common-datatypes
+  (:use :common-lisp :monkeylib-binary-data)
   (:export
    :u1
    :u2

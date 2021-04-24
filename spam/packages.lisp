@@ -1,10 +1,10 @@
 (in-package :cl-user)
 
-(defpackage :com.gigamonkeys.spam
+(defpackage :monkeylib-spam
   (:nicknames :spam)
   (:use :common-lisp
-        :com.gigamonkeys.pathnames
-        :com.gigamonkeys.utilities)
+        :monkeylib-pathnames
+        :monkeylib-utilities)
   (:export
    :make-feature-database
    :clear-database

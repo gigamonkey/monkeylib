@@ -1,4 +1,4 @@
-(in-package :com.gigamonkeys.macro-utilities)
+(in-package :monkeylib-macro-utilities)
 
 (defun gensyms (names)
   (mapcar (lambda (x) (gensym (string x))) names))

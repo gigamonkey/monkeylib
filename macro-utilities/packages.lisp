@@ -4,7 +4,7 @@
 
 (in-package :cl-user)
 
-(defpackage :com.gigamonkeys.macro-utilities
+(defpackage :monkeylib-macro-utilities
   (:use :common-lisp)
   (:export 
    :gensyms

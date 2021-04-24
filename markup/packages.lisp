@@ -4,9 +4,9 @@
 
 (in-package :cl-user)
 
-(defpackage :com.gigamonkeys.markup
+(defpackage :monkeylib-markup
   (:use :common-lisp
-        :com.gigamonkeys.utilities
-        :com.gigamonkeys.pathnames)
+        :monkeylib-utilities
+        :monkeylib-pathnames)
   (:export :parse-file
            :parse-text))

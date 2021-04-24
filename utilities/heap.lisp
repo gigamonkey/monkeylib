@@ -2,7 +2,7 @@
 ;; Copyright (c) 2005, Gigamonkeys Consulting All rights reserved.
 ;;
 
-(in-package :com.gigamonkeys.utilities)
+(in-package :monkeylib-utilities)
 
 ;; To build a timer queue on a heap. Keep a heap of scheduled items,
 ;; ordered by the time when they are to run, sooner items first. Each

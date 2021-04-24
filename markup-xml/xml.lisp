@@ -1,4 +1,4 @@
-(in-package :com.gigamonkeys.markup.xml)
+(in-package :monkeylib-markup.xml)
 
 (define-xml-language markup-xml 
   (:block-elements :body :blockquote :ol :ul :li :link_def :note)
@@ -9,6 +9,6 @@
   (let ((sexps (parse-file file :parse-links-p t)))
     (with-output-to-file (out (make-pathname :type "xml" :defaults file))
       (with-foo-output (out)
-        (com.gigamonkeys.foo.xml::emit-for-language 'markup-xml sexps)))))
+        (monkeylib-foo.xml::emit-for-language 'markup-xml sexps)))))
 
   

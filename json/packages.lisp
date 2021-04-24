@@ -1,14 +1,14 @@
 (in-package :cl-user)
 
-(defpackage :com.gigamonkeys.json.parser
-  (:use :cl :com.gigamonkeys.parser)
+(defpackage :monkeylib-json.parser
+  (:use :cl :monkeylib-parser)
   (:shadow :string :exp)
   (:export :parse-json :*object-type*))
 
-(defpackage :com.gigamonkeys.json
+(defpackage :monkeylib-json
   (:use :cl
-        :com.gigamonkeys.utilities
-        :com.gigamonkeys.json.parser)
+        :monkeylib-utilities
+        :monkeylib-json.parser)
   (:export
    :write-json
    :json

@@ -2,7 +2,7 @@
 ;; Copyright (c) 2005, Gigamonkeys Consulting All rights reserved.
 ;;
 
-(in-package :com.gigamonkeys.foo.language)
+(in-package :monkeylib-foo.language)
 
 ;;; Hmmmm. Might be useful to support symbol macros.
 

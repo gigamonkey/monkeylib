@@ -6,7 +6,7 @@
 ;;
 ;; Copyright (c) 2003-2006 Peter Seibel
 
-(in-package :com.gigamonkeys.math-parser)
+(in-package :monkeylib-math-parser)
 
 (defchartype digit     '(satisfies digit-char-p))
 (defchartype term-op   '(member #\+ #\-))

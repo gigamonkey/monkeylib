@@ -1,4 +1,4 @@
-(in-package :com.gigamonkeys.json.parser)
+(in-package :monkeylib-json.parser)
 
 ;; Parser for JSON syntax (<http://www.json.org/>)
 

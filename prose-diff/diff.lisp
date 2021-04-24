@@ -1,4 +1,4 @@
-(in-package :com.gigamonkeys.prose-diff)
+(in-package :monkeylib-prose-diff)
 
 ;;;
 ;;; Generic functions for diffing vectors of objects.

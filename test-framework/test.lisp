@@ -2,7 +2,7 @@
 ;; Copyright (c) 2005, Gigamonkeys Consulting All rights reserved.
 ;;
 
-(in-package :com.gigamonkeys.test)
+(in-package :monkeylib-test)
 
 (defvar *test-name* nil)
 (defvar *report-passes* nil)

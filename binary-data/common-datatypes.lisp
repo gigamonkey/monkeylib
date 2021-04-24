@@ -2,7 +2,7 @@
 ;; Copyright (c) 2005, Gigamonkeys Consulting All rights reserved.
 ;;
 
-(in-package :com.gigamonkeys.binary-data.common-datatypes)
+(in-package :monkeylib-binary-data.common-datatypes)
 
 (define-binary-type unsigned-integer (bytes bits-per-byte)
   (:reader (in)

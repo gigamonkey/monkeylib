@@ -2,7 +2,7 @@
 ;; Copyright (c) 2010, Peter Seibel. All rights reserved.
 ;;
 
-(in-package :com.gigamonkeys.prose-diff)
+(in-package :monkeylib-prose-diff)
 
 (defparameter *word-regexp* (create-scanner "((?:\\\\n{.*?})|(?:\\w*’\\w+)|(?:\\w+))"))
 (defparameter *old-mode-regexp* (create-scanner "-\\*- mode: .*; -\\*-"))

@@ -1,6 +1,6 @@
 (in-package :cl-user)
 
-(defpackage :com.gigamonkeys.parser
+(defpackage :monkeylib-parser
   (:use :cl)
   (:shadow :type)
   (:export
@@ -23,7 +23,7 @@
    :^
    :%))
 
-(defpackage :com.gigamonkeys.new-parser
+(defpackage :monkeylib-new-parser
   (:use :cl)
   (:shadow :type)
   (:export
@@ -44,25 +44,25 @@
    :^
    :%))
 
-(defpackage :com.gigamonkeys.math-parser
-  (:use :common-lisp :com.gigamonkeys.parser)
+(defpackage :monkeylib-math-parser
+  (:use :common-lisp :monkeylib-parser)
   (:export :arithmetic :calculator))
 
-(defpackage :com.gigamonkeys.java-lexer
-  (:use :cl :com.gigamonkeys.parser))
+(defpackage :monkeylib-java-lexer
+  (:use :cl :monkeylib-parser))
 
 
-(defpackage :com.gigamonkeys.css
-  (:use :cl :com.gigamonkeys.parser))
+(defpackage :monkeylib-css
+  (:use :cl :monkeylib-parser))
 
-(defpackage :com.gigamonkeys.parser.dot-parser
-  (:use :cl :com.gigamonkeys.parser
-	:com.gigamonkeys.utilities)
-  (:shadowing-import-from :com.gigamonkeys.parser :!)
+(defpackage :monkeylib-parser.dot-parser
+  (:use :cl :monkeylib-parser
+	:monkeylib-utilities)
+  (:shadowing-import-from :monkeylib-parser :!)
   (:shadow :string))
 
-(defpackage :com.gigamonkeys.parser.time-period-parser
-  (:use :cl :com.gigamonkeys.parser
-	:com.gigamonkeys.utilities)
-  (:shadowing-import-from :com.gigamonkeys.parser :!)
+(defpackage :monkeylib-parser.time-period-parser
+  (:use :cl :monkeylib-parser
+	:monkeylib-utilities)
+  (:shadowing-import-from :monkeylib-parser :!)
   (:shadow :step :time))

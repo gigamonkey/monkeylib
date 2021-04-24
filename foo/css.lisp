@@ -2,7 +2,7 @@
 ;; Copyright (c) 2005, Gigamonkeys Consulting All rights reserved.
 ;;
 
-(in-package :com.gigamonkeys.foo.css)
+(in-package :monkeylib-foo.css)
 
 (defclass css (language)
   ()

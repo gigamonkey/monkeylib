@@ -2,7 +2,7 @@
 ;; Copyright (c) 2005, Gigamonkeys Consulting All rights reserved.
 ;;
 
-(in-package :com.gigamonkeys.utilities)
+(in-package :monkeylib-utilities)
 
 (defclass timer ()
   ((events :initform (make-heap) :accessor events)

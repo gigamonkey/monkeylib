@@ -1,4 +1,4 @@
-(in-package :com.gigamonkeys.spam)
+(in-package :monkeylib-spam)
 
 (defun explain-classification (features db)
   (multiple-value-bind (classification score) (classify features)

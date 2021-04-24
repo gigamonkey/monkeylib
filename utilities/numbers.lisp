@@ -1,4 +1,4 @@
-(in-package :com.gigamonkeys.utilities)
+(in-package :monkeylib-utilities)
 
 (defun round-to (number n &optional (rounding-function #'round))
   "Round to nearest `n'. (round-to x 1) === (round x)"

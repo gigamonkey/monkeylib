@@ -1,6 +1,6 @@
 (in-package :cl-user)
 
-(defpackage :com.gigamonkeys.statistics
+(defpackage :monkeylib-statistics
   (:use :cl)
   (:export :mean
 	   :median

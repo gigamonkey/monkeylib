@@ -11,7 +11,7 @@
 ;;; Each grammar matches over a certain range of the input text (or tokens).
 ;;; Can save the raw text matched (or the start and end indices).
 
-(in-package :com.gigamonkeys.new-parser)
+(in-package :monkeylib-new-parser)
 
 ;;; Expand bits of grammar into code to do the matching.
 

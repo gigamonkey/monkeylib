@@ -2,9 +2,9 @@
 ;; Copyright (c) 2005, Gigamonkeys Consulting All rights reserved.
 ;;
 
-(in-package :com.gigamonkeys.foo.xml)
+(in-package :monkeylib-foo.xml)
 
-(defvar *css* (make-instance 'com.gigamonkeys.foo.css::css))
+(defvar *css* (make-instance 'monkeylib-foo.css::css))
 
 (define-html-macro :comment (&body body)
   `(:progn
@@ -53,7 +53,7 @@
 (define-html-macro :lispscript (&body body)
   `((:script :type "text/javascript")
     (:comment
-     (:with-language (com.gigamonkeys.foo.lispscript::*lispscript*)
+     (:with-language (monkeylib-foo.lispscript::*lispscript*)
        ,@body))))
 
 (defparameter *interpolated-foo* '((:title . "My TITLE")))

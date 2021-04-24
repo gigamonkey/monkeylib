@@ -7,7 +7,7 @@
 (defpackage :monkeylib-text-languages
   (:use :cl
 	:monkeylib-text-output
-	:com.gigamonkeys.macro-utilities)
+	:monkeylib-macro-utilities)
   (:export
    :case-preserving-readtable
    :comment

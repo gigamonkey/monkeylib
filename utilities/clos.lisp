@@ -1,4 +1,4 @@
-(in-package :com.gigamonkeys.utilities)
+(in-package :monkeylib-utilities)
 
 (defmacro with-slot-values ((&rest names) object &body body)
   (once-only (object)
