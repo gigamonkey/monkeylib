@@ -10,8 +10,8 @@
    (:file "footnotes" :depends-on ("packages"))
    (:file "handy-tags" :depends-on ("packages")))
   :depends-on
-  (:com.gigamonkeys.macro-utilities
+  (:monkeylib-macro-utilities
    :alexandria
-   :com.gigamonkeys.markup
-   :com.gigamonkeys.utilities
+   :monkeylib-markup
+   :monkeylib-utilities
    :monkeylib-html))

@@ -2,7 +2,7 @@
 ;; Copyright (c) 2005-2010, Peter Seibel. All rights reserved.
 ;;
 
-(defsystem com.gigamonkeys.utilities
+(defsystem monkeylib-utilities
   :description "Peter Seibel's collection of 'utilities'."
   :components
   ((:file "packages")

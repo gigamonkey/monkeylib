@@ -6,9 +6,9 @@
   :author "Peter Seibel <peter@gigamonkeys.com>"
   :licence "BSD"
   :description "ATOM feed generation"
-  :depends-on (:com.gigamonkeys.pathnames
-               :com.gigamonkeys.utilities
-               :com.gigamonkeys.markup
+  :depends-on (:monkeylib-pathnames
+               :monkeylib-utilities
+               :monkeylib-markup
                :monkeylib-html
                :monkeylib-text-output
                :monkeylib-text-languages)

@@ -2,7 +2,7 @@
 ;;; All rights reserved. See COPYING for details.
 
 (defsystem monkeylib-html
-  :name "com.gigamonkeys.foo"
+  :name "monkeylib-html"
   :author "Peter Seibel <peter@gigamonkeys.com>"
   :version "1.0"
   :licence "BSD"
@@ -14,9 +14,9 @@
    (:file "html-tests"       :depends-on ("packages" "html"))
    (:file "xml"              :depends-on ("packages"))
    (:file "xml-macros"       :depends-on ("packages" "xml")))
-  :depends-on (:com.gigamonkeys.macro-utilities
-	       :com.gigamonkeys.test-framework
-	       :com.gigamonkeys.pathnames
-	       :com.gigamonkeys.utilities
+  :depends-on (:monkeylib-macro-utilities
+               :monkeylib-test-framework
+               :monkeylib-pathnames
+               :monkeylib-utilities
                :monkeylib-text-output
                :monkeylib-text-languages))

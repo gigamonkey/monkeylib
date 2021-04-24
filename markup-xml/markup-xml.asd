@@ -9,6 +9,6 @@
   ((:file "packages")
    (:file "xml" :depends-on ("packages")))
   :depends-on
-  (:com.gigamonkeys.macro-utilities
-   :com.gigamonkeys.utilities
-   :com.gigamonkeys.foo))
+  (:monkeylib-foo
+   :monkeylib-macro-utilities
+   :monkeylib-utilities))

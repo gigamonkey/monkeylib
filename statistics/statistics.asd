@@ -2,7 +2,7 @@
 ;; Copyright (c) 2009, Gigamonkeys Consulting All rights reserved.
 ;;
 
-(defsystem com.gigamonkeys.statistics
+(defsystem monkeylib-statistics
   :description "Some basic statistics-computing functions."
   :components
   ((:file "packages")

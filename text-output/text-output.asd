@@ -10,7 +10,7 @@
   :components
   ((:file "packages")
    (:file "text-output" :depends-on ("packages")))
-  :depends-on (:com.gigamonkeys.macro-utilities
-	       :com.gigamonkeys.test-framework
-	       :com.gigamonkeys.pathnames
-	       :com.gigamonkeys.utilities))
+  :depends-on (:monkeylib-pathnames
+               :monkeylib-test-framework
+               :monkeylib-utilities
+               :monkeylib-macro-utilities))

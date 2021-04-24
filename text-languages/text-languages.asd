@@ -11,5 +11,5 @@
   ((:file "packages")
    (:file "language"       :depends-on ("packages"))
    (:file "file-compiler" :depends-on ("packages" "language")))
-  :depends-on (:monkeylib-text-output
-               :com.gigamonkeys.macro-utilities))
+  :depends-on (:monkeylib-macro-utilities
+               :monkeylib-text-output))

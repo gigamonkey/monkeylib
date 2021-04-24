@@ -1,7 +1,7 @@
 ;;; Copyright (c) 2005-2011, Peter Seibel.
 ;;; All rights reserved. See COPYING for details.
 
-(defsystem com.gigamonkeys.macro-utilities
+(defsystem monkeylib-macro-utilities
   :author "Peter Seibel <peter@gigamonkeys.com>"
   :description "A few standard macro-writing macros. Deprecated. Use Alexandria instead."
   :components

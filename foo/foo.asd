@@ -2,11 +2,8 @@
 ;; Copyright (c) 2005, Gigamonkeys Consulting All rights reserved.
 ;;
 
-(defpackage :com.gigamonkeys.foo-system (:use :asdf :cl))
-(in-package :com.gigamonkeys.foo-system)
-
-(defsystem com.gigamonkeys.foo
-  :name "com.gigamonkeys.foo"
+(defsystem monkeylib-foo
+  :name "monkeylib-foo"
   :author "Peter Seibel <peter@gigamonkeys.com>"
   :version "1.0"
   :maintainer "Peter Seibel <peter@gigamonkeys.com>"
@@ -28,6 +25,6 @@
    (:file "javascript"       :depends-on ("packages" "language"))
    (:file "lispscript"       :depends-on ("packages" "language" "javascript" "html"))
    (:file "lispscript-tests" :depends-on ("packages" "lispscript" "html" "html-macros" "html-legacy")))
-  :depends-on (:com.gigamonkeys.test-framework
-               :com.gigamonkeys.pathnames
-               :com.gigamonkeys.utilities))
+  :depends-on (:monkeylib-test-framework
+               :monkeylib-pathnames
+               :monkeylib-utilities))
