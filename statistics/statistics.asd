@@ -1,5 +1,5 @@
 ;;
-;; Copyright (c) 2009, Gigamonkeys Consulting All rights reserved.
+;; Copyright (c) 2009, Peter Seibel All rights reserved.
 ;;
 
 (defsystem monkeylib-statistics

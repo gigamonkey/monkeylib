@@ -1,5 +1,5 @@
 ;;
-;; Copyright (c) 2005, Gigamonkeys Consulting All rights reserved.
+;; Copyright (c) 2005, Peter Seibel All rights reserved.
 ;;
 
 (in-package :monkeylib-foo.xml)

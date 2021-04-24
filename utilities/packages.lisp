@@ -1,5 +1,5 @@
 ;;
-;; Copyright (c) 2005-2012 Gigamonkeys Consulting All rights reserved.
+;; Copyright (c) 2005-2012 Peter Seibel All rights reserved.
 ;;
 
 (in-package :cl-user)

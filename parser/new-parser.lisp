@@ -1,5 +1,5 @@
 ;;;
-;;; Copyright (c) 2003-2005, Gigamonkeys Consulting All rights reserved.
+;;; Copyright (c) 2003-2005, Peter Seibel All rights reserved.
 ;;;
 ;;; Parser generator, loosely based on Henry Baker's META paper. The
 ;;; most obvious change is that we don't user reader macros because
