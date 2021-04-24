@@ -1,0 +1,30 @@
+body { margin: 1.5in; }
+
+#buttons { position: fixed; top: 6px; left: 6px; width: 1in; list-style-type: none; padding: 0; }
+#buttons li button { padding-left: 3px; width: 90%; background: #eee; }
+
+/* Logical styles */
+
+.add { }
+
+.delete { }
+
+.moved-to { }
+
+.moved-from { }
+
+/* Actual display styles */
+
+.hidden { display: none; }
+
+.delete.diff {  color: red; text-decoration: line-through; }
+
+.add.diff { color: blue; }
+
+.moved-to.diff { background-color: #ffc; }
+
+.moved-from.diff { background-color: #ccc; }
+
+/* Button style */
+
+.selected { font-weight: 900; background: #888 !important; }
