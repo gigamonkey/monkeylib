@@ -1,4 +1,4 @@
-;;; Copyright (c) 2011, Peter Seibel.;
+;;; Copyright (c) 2011, Peter Seibel.
 ;;; All rights reserved. See LICENSE for details.
 
 (in-package :cl-user)
