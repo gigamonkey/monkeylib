@@ -1,13 +1,12 @@
-;;; Copyright (c) 2005-2011, Peter Seibel. All rights reserved.
-;;;
-;;; See COPYING for details.
+;;; Copyright (c) 2005-2011, Peter Seibel.
+;;; All rights reserved. See LICENSE for details.
 
 (in-package :cl-user)
 
 (defpackage :monkeylib-text-languages
   (:use :cl
-	:monkeylib-text-output
-	:monkeylib-macro-utilities)
+        :monkeylib-text-output
+        :monkeylib-macro-utilities)
   (:export
    :case-preserving-readtable
    :comment
@@ -48,4 +47,3 @@
    :generate-from/to-streams
    :generate-from-sexp
 ))
-

@@ -1,4 +1,5 @@
-;;; Copyright (c) 2005-2001, Peter Seibel. All rights reserved. See COPYING for details.
+;;; Copyright (c) 2005-2001, Peter Seibel.
+;;; All rights reserved. See LICENSE for details.
 
 (in-package :monkeylib-text-languages)
 

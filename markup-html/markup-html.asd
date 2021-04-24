@@ -1,5 +1,5 @@
 ;;; Copyright (c) 2010-2011, Peter Seibel.
-;;; All rights reserved. See COPYING for details.
+;;; All rights reserved. See LICENSE for details.
 
 (defsystem monkeylib-markup-html
   :name "monkeylib-markup-html"

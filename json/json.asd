@@ -1,5 +1,5 @@
 ;;; Copyright (c) 2009-2012, Peter Seibel.
-;;; All rights reserved. See COPYING for details.
+;;; All rights reserved. See LICENSE for details.
 
 (defsystem monkeylib-json
   :author "Peter Seibel <peter@gigamonkeys.com>"

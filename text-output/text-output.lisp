@@ -1,6 +1,5 @@
-;;; Copyright (c) 2005-2011, Peter Seibel. All rights reserved.
-;;;
-;;; See COPYING for details.
+;;; Copyright (c) 2005-2011, Peter Seibel.
+;;; All rights reserved. See LICENSE for details.
 
 (in-package :monkeylib-text-output)
 
@@ -19,7 +18,7 @@
 
 (defmacro with-text-output ((stream &key (pretty *pretty*)) &body body)
   `(let* ((*text-output* ,stream)
-	  (*text-pretty-printer* nil)
+          (*text-pretty-printer* nil)
           (*pretty* ,pretty))
      ,@body))
 
@@ -157,7 +156,7 @@
              (ecase (first op)
                (:raw-string (write-sequence (second op) buf))
                ((:newline :embed-value :embed-code) (add-op op))
-	       (:freshline (add-op (if *pretty* op '(:newline))))
+               (:freshline (add-op (if *pretty* op '(:newline))))
                ((:indent :unindent :toggle-indenting)
                 (when *pretty* (add-op op)))))
         (compile-buffer buf new-ops)))
@@ -263,4 +262,3 @@
 (defun make-op-buffer () (make-array 10 :adjustable t :fill-pointer 0))
 
 (defun push-op (op ops-buffer) (vector-push-extend op ops-buffer))
-

@@ -1,6 +1,5 @@
-;;; Copyright (c) 2005-2011, Peter Seibel. All rights reserved.
-;;;
-;;; See COPYING for details.
+;;; Copyright (c) 2005-2011, Peter Seibel.
+;;; All rights reserved. See LICENSE for details.
 
 (in-package :cl-user)
 
@@ -23,6 +22,3 @@
    :toggle-indenting
    :unindent
    :with-text-output))
-
-
-

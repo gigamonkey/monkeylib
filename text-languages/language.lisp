@@ -1,4 +1,5 @@
-;;; Copyright (c) 2005-2001, Peter Seibel. All rights reserved. See COPYING for details.
+;;; Copyright (c) 2005-2001, Peter Seibel.
+;;; All rights reserved. See LICENSE for details.
 
 (in-package :monkeylib-text-languages)
 
@@ -179,14 +180,14 @@ characters will need their own specializations of this method."
   (with-gensyms (whole)
     (multiple-value-bind (parameters environment) (parse-&environment other-parameters)
       `(eval-when (:compile-toplevel :load-toplevel :execute)
-	 (setf (get ',name ',special-operator-symbol)
-	       (lambda (,language ,processor ,whole ,environment)
-		 (declare (ignorable ,environment ,language ,processor))
-		 (handler-case
-		     (destructuring-bind (,@parameters) (rest ,whole)
-		       ,@body)
-		   (error (e)
-		     (error 'foo-syntax-error :form ,whole :cause e)))))))))
+         (setf (get ',name ',special-operator-symbol)
+               (lambda (,language ,processor ,whole ,environment)
+                 (declare (ignorable ,environment ,language ,processor))
+                 (handler-case
+                     (destructuring-bind (,@parameters) (rest ,whole)
+                       ,@body)
+                   (error (e)
+                     (error 'foo-syntax-error :form ,whole :cause e)))))))))
 
 (define-condition foo-syntax-error ()
   ((form :initarg :form :accessor form-of)
@@ -200,15 +201,15 @@ characters will need their own specializations of this method."
   (with-gensyms (whole namevar)
     (multiple-value-bind (parameters environment) (parse-&environment parameters)
       `(eval-when (:compile-toplevel :load-toplevel :execute)
-	 (setf (get ',name ',macro-symbol)
-	       (lambda (,whole ,environment)
-		 (declare (ignorable ,environment))
-		 (handler-case
-		     (destructuring-bind (,@(normalize-macro-lambda-list parameters namevar)) ,whole
-		       (declare (ignore ,namevar))
-		       ,@body)
-		   (error (e)
-		     (error 'foo-syntax-error :form ,whole :cause e)))))))))
+         (setf (get ',name ',macro-symbol)
+               (lambda (,whole ,environment)
+                 (declare (ignorable ,environment))
+                 (handler-case
+                     (destructuring-bind (,@(normalize-macro-lambda-list parameters namevar)) ,whole
+                       (declare (ignore ,namevar))
+                       ,@body)
+                   (error (e)
+                     (error 'foo-syntax-error :form ,whole :cause e)))))))))
 
 (defun parse-&environment (parameters)
   "Parse out an optional &environment parameter and return the
@@ -225,7 +226,7 @@ parameter list without it and the name of the parameter."
 macro form, including an optional &whole parameter and a
 parameter to eat up the macro name."
   (let* ((back (if (eql (car parameters) '&whole) (cddr parameters) parameters))
-	 (front (ldiff parameters back)))
+         (front (ldiff parameters back)))
     `(,@front ,namevar ,@back)))
 
 (defun self-evaluating-p (form)
@@ -243,14 +244,14 @@ parameter to eat up the macro name."
   "Code generator generator."
   (loop for thing in body collect
        (etypecase thing
-	 (string `(raw-string ,processor ,thing ,(not (not (find #\Newline thing)))))
-	 (cons thing)
-	 (keyword
-	  (ecase thing
-	    (:newline `(newline ,processor))
-	    (:freshline `(freshline ,processor))
-	    (:indent `(indent ,processor))
-	    (:unindent `(unindent ,processor)))))))
+         (string `(raw-string ,processor ,thing ,(not (not (find #\Newline thing)))))
+         (cons thing)
+         (keyword
+          (ecase thing
+            (:newline `(newline ,processor))
+            (:freshline `(freshline ,processor))
+            (:indent `(indent ,processor))
+            (:unindent `(unindent ,processor)))))))
 
 (defun case-preserving-readtable ()
   (let ((readtable (copy-readtable)))
@@ -279,10 +280,9 @@ symbols. This is used to implement inheritance of special forms "
   `(defmacro ,name (&whole whole &body body)
      (declare (ignore body))
      `(macrolet ((,(car whole) (&body body)
-		   (let* ((lang (make-instance ',(car whole)))
-			  (env (top-level-environment lang)))
-		     (codegen-text (sexp->ops lang body env) ,*pretty*))))
-	,@(if *pretty*
-	      `((let ((*text-pretty-printer* (get-pretty-printer))) ,whole))
-	      `(,whole)))))
-
+                   (let* ((lang (make-instance ',(car whole)))
+                          (env (top-level-environment lang)))
+                     (codegen-text (sexp->ops lang body env) ,*pretty*))))
+        ,@(if *pretty*
+              `((let ((*text-pretty-printer* (get-pretty-printer))) ,whole))
+              `(,whole)))))
