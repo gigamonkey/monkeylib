@@ -2,7 +2,7 @@
 ;; Copyright (c) 2010, Peter Seibel. All rights reserved.
 ;;
 
-(in-package com.gigamonkeys.markup)
+(in-package :monkeylib-markup)
 
 (defparameter *to-skip* '())
 
@@ -12,7 +12,7 @@
 
 (defun test-files (dir)
   (let ((files ()))
-    (walk-directory dir (lambda (x) 
+    (walk-directory dir (lambda (x)
                           (when (cl-ppcre:scan ".*[0-9].*\\.txt$" (file-namestring x))
                             (push x files))))
     (sort files #'< :key #'test-number)))
@@ -36,7 +36,7 @@
 
 
 (defun test (n &rest parser-args)
-  (apply #'test-file 
+  (apply #'test-file
          (make-pathname
           :directory '(:relative "tests")
           :name (format nil "test_~2,'0d" n)
@@ -44,7 +44,7 @@
          parser-args))
 
 (defun ok (n)
-  (ok-file 
+  (ok-file
    (make-pathname
     :directory '(:relative "tests")
     :name (format nil "test_~2,'0d" n)
@@ -102,18 +102,18 @@
                    (list most-positive-fixnum p filename))))))
 
     (let ((tests (sort (mapcar #'file-to-list (remove-if-not #'txt-p (list-directory "."))) #'< :key #'car)))
-      
+
       (loop with digits = (max (ceiling (log (1+ (length tests)) 10)) 2)
-         for i from 1 
+         for i from 1
          for (num original name) in tests
          collect (rename-file original (format nil "~v,'0d_~a.txt" digits (* i spacing) name))))))
-    
+
 
 (defun txt-p (p) (string= (pathname-type p) "txt"))
 
 
 (defun newtest (n &rest parser-args)
-  (apply #'test-file 
+  (apply #'test-file
          (make-pathname
           :directory '(:relative "tests")
           :name (format nil "test_~2,'0d" n)
