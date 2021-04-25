@@ -1,4 +1,4 @@
-(in-package :monkeylib-foo.xml)
+(in-package :monkeylib-foo-xml)
 
 (defun escape-char (char)
   (case char
@@ -17,4 +17,3 @@
             do (write-sequence in out :start start :end pos)
             when pos do (write-sequence (escape-char (char in pos)) out)
             while pos))))
-

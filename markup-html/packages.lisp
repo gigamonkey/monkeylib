@@ -4,7 +4,7 @@
 
 (in-package :cl-user)
 
-(defpackage :monkeylib-markup.html
+(defpackage :monkeylib-markup-html
   (:use :common-lisp
         :monkeylib-markup
         :monkeylib-utilities)
@@ -19,8 +19,8 @@
    :footnotes
    :just-text))
 
-(defpackage :monkeylib-markup.html.handy-tags
-  (:use :common-lisp :monkeylib-markup.html)
+(defpackage :monkeylib-markup-html-handy-tags
+  (:use :common-lisp :monkeylib-markup-html)
   (:export
    :add-amazon-image-bugs
    :mailto-link

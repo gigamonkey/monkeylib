@@ -1,4 +1,4 @@
-(in-package :monkeylib-markup.html)
+(in-package :monkeylib-markup-html)
 
 (defun footnotes (tag sexp &key (number-format "~d"))
   (let ((note-num 0)
@@ -9,7 +9,7 @@
         (note-href-fmt (format nil "#~(~a~)_~~d" tag))
         (noteref-name-fmt (format nil "~(~a~)ref_~~d" tag))
         (noteref-href-fmt (format nil "#~(~a~)ref_~~d" tag)))
-    
+
     (labels ((walker (x)
                (cond
                  ((stringp x) x)
@@ -23,16 +23,16 @@
                   (let ((starting-note-num note-num)
                         (body (mapcar #'walker (cdr x))))
                     `(:p ,@(wrap-with-noterefs body starting-note-num note-num noteref-name-fmt))))
-                 (t 
+                 (t
                   `(,(car x) ,@(mapcar #'walker (cdr x)))))))
 
       (let ((walked (walker sexp)))
-        `(,@walked 
+        `(,@walked
           ,@(when notes
                   `(((:div :class (:format "~(~a~)s" ,tag))
-                   ,@(loop for num from 1 
+                   ,@(loop for num from 1
                         for note in (nreverse notes)
-                        collect 
+                        collect
                           (destructuring-bind (notetag (ptag . prest) . nrest) note
                             (declare (ignore notetag))
                             `((:div :class ,(string-downcase tag))

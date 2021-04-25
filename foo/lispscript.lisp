@@ -13,15 +13,15 @@
 ;;; will return someobject rather than the Foo object which is 'this'
 ;;; in a-method. Blech.
 
-(in-package :monkeylib-foo.lispscript)
+(in-package :monkeylib-foo-lispscript)
 
 (defclass lispscript (javascript)
   ()
   (:default-initargs
-    :input-package (find-package :monkeylib-foo.lispscript)))
+    :input-package (find-package :monkeylib-foo-lispscript)))
 
 (defparameter *lispscript* (make-instance 'lispscript))
-(defparameter *html* (make-instance 'monkeylib-foo.xml::html))
+(defparameter *html* (make-instance 'monkeylib-foo-xml::html))
 
 
 ;;; Compilation environment
@@ -31,7 +31,7 @@
 
 (defun needs-value (env)
   (or (cdr (assoc 'needs-value env))
-      (eql (monkeylib-foo.javascript::statement-or-expression env) :expression)))
+      (eql (monkeylib-foo-javascript::statement-or-expression env) :expression)))
 
 (defun find-open-block (name env &key (expected t))
   (let ((cons (assoc `(open-block ,name) env :test #'equal)))
@@ -53,7 +53,7 @@
 (defun block-returned-p (name env)
   (let ((cons (find-open-block name env :expected t)))
     (cdr cons)))
-  
+
 ;;; Sub-primitive special operators. Not meant to be used directly in
 ;;; user code but handy for implementing primitive special operators
 ;;; and "built-in" macros.
@@ -77,16 +77,16 @@
 
 (define-javascript-macro |let| ((&rest bindings) &body body &environment env)
   `(scope (,@bindings)
-	  ,(if (needs-value env)
-	       `(return-last ,@body)
-	       `(discard-value (prog ,@body)))))
+          ,(if (needs-value env)
+               `(return-last ,@body)
+               `(discard-value (prog ,@body)))))
 
 (define-javascript-macro |let*| ((&rest bindings) &body body)
   (if bindings
       `(|let| (,(first bindings))
-	      ,@(if (rest bindings)
-		    `((|let*| (,@(rest bindings)) ,@body))
-		    body))
+              ,@(if (rest bindings)
+                    `((|let*| (,@(rest bindings)) ,@body))
+                    body))
       `(|let| () ,@body)))
 
 
@@ -110,7 +110,7 @@ function Widget () {
 }
 
 Widget.prototype.aMethod = function () { return this; };
-Widget.prototype.aClosure = function () { 
+Widget.prototype.aClosure = function () {
     return (function (gensym) {
       return function () {
         return (function () { return this; }).call(gensym);
@@ -130,31 +130,31 @@ Widget.prototype.aClosure = function () {
 
 (define-javascript-macro |block| (name &body body &environment env)
   (let ((e (javascript-gensym))
-	(return-var (block-name name)))
+        (return-var (block-name name)))
     (if (not (returned-p return-var body env))
-	`(|progn| ,@body)
-	`(augment-environment
-	  (((open-block ,return-var) . nil))
-	  ,(if (needs-value env)
-	       `((function
-		  (,return-var)
-		  (try 
-		   (return (|progn| ,@body))
-				       (catch ,e
-					 (if (|eq| ,e ,return-var)
-					     (return (@ ,return-var |value|))
-					     (throw ,e)))))
-		 (object |value| |undefined|))
-	       `((function
-		  (,return-var)
-		  (try (prog ,@body)
-		       (catch ,e
-			 (if (|eq| ,e ,return-var)
-			     (return (@ ,return-var |value|))
-			     (throw ,e)))))
-		 (object |value| |undefined|)))))))
+        `(|progn| ,@body)
+        `(augment-environment
+          (((open-block ,return-var) . nil))
+          ,(if (needs-value env)
+               `((function
+                  (,return-var)
+                  (try
+                   (return (|progn| ,@body))
+                                       (catch ,e
+                                         (if (|eq| ,e ,return-var)
+                                             (return (@ ,return-var |value|))
+                                             (throw ,e)))))
+                 (object |value| |undefined|))
+               `((function
+                  (,return-var)
+                  (try (prog ,@body)
+                       (catch ,e
+                         (if (|eq| ,e ,return-var)
+                             (return (@ ,return-var |value|))
+                             (throw ,e)))))
+                 (object |value| |undefined|)))))))
 
-(defun block-name (symbol) 
+(defun block-name (symbol)
   (intern (format nil "block$~a" (symbol-name symbol)) :keyword))
 
 (defun returned-p (block-name body env)
@@ -174,11 +174,11 @@ don't need to set up all the machinery for returning."
   (mark-block-return (block-name name) env)
   (if (needs-value env)
       `(|progn|
-	(|set| (@ ,(block-name name) |value|) ,value)
-	((function () (throw ,(block-name name)))))
+        (|set| (@ ,(block-name name) |value|) ,value)
+        ((function () (throw ,(block-name name)))))
       `(prog
-	   (|set| (@ ,(block-name name) |value|) ,value)
-	  (throw ,(block-name name)))))
+           (|set| (@ ,(block-name name) |value|) ,value)
+          (throw ,(block-name name)))))
 
 (define-javascript-macro |return| (value)
   `(|return-from| |nil| ,value))
@@ -207,11 +207,11 @@ don't need to set up all the machinery for returning."
 (define-javascript-macro |cond| (&body clauses)
   (destructuring-bind ((test &body body) &rest clauses) clauses
     (if (eql test '|true|)
-	`(|progn| ,@body)
-	`(|if| (needs-value ,test)
-	       (|progn| ,@body)
-	       ,@(when clauses
-		       `((|cond| ,@clauses)))))))
+        `(|progn| ,@body)
+        `(|if| (needs-value ,test)
+               (|progn| ,@body)
+               ,@(when clauses
+                       `((|cond| ,@clauses)))))))
 
 (define-javascript-macro |when| (test &body body)
   `(|if| ,test (|progn| ,@body)))
@@ -231,55 +231,55 @@ don't need to set up all the machinery for returning."
 (define-javascript-macro |do| ((&rest variables) (end-test-form &optional (result-form '|undefined|)) &body body)
   (multiple-value-bind (bindings step-forms) (parse-do-variables variables)
     `(|block| |nil|
-	      (|let| (,@bindings)
-		     (while (! ,end-test-form)
-		       (block ,@body
-			 ,@step-forms))
-		     ,@(when result-form (list result-form))))))
+              (|let| (,@bindings)
+                     (while (! ,end-test-form)
+                       (block ,@body
+                         ,@step-forms))
+                     ,@(when result-form (list result-form))))))
 
 (define-javascript-macro |do*| ((&rest variables) (end-test-form &optional result-form) &body body)
   (multiple-value-bind (bindings step-forms) (parse-do-variables variables)
     `(|block| |nil|
-	      (|let*| (,@bindings)
-		      (while (! ,end-test-form)
-			(block ,@body
-			  ,@step-forms))
-		      ,@(when result-form (list result-form))))))
+              (|let*| (,@bindings)
+                      (while (! ,end-test-form)
+                        (block ,@body
+                          ,@step-forms))
+                      ,@(when result-form (list result-form))))))
 
 (define-javascript-macro |dotimes| ((var iterations) &body body &environment env)
   (let ((iterations-value (javascript-gensym)))
     `(|block| |nil|
-	      (var ,iterations-value ,iterations)
-	      (|for| ((var ,var 0) (< ,var ,iterations-value) (++ ,var :post)) ,@body))))
+              (var ,iterations-value ,iterations)
+              (|for| ((var ,var 0) (< ,var ,iterations-value) (++ ,var :post)) ,@body))))
 
 (define-javascript-macro |doarray| ((var array) &body body)
   (let* ((idxvar (javascript-gensym))
-	 (array-value (javascript-gensym))
-	 (iterations-value (javascript-gensym)))
+         (array-value (javascript-gensym))
+         (iterations-value (javascript-gensym)))
     `(|block| |nil|
-	      (var ,array-value ,array)
-	      (var ,iterations-value (@ ,array |length|))
-	      (|for| ((var ,idxvar 0) (< ,idxvar ,iterations-value) (++ ,idxvar :post)) 
-		     (block (discard-value (|let| ((,var (ref ,array-value ,idxvar))) ,@body)))))))
+              (var ,array-value ,array)
+              (var ,iterations-value (@ ,array |length|))
+              (|for| ((var ,idxvar 0) (< ,idxvar ,iterations-value) (++ ,idxvar :post))
+                     (block (discard-value (|let| ((,var (ref ,array-value ,idxvar))) ,@body)))))))
 
 (define-javascript-macro |dolist| ((var sequence) &body body &environment env)
   (let* ((idxvar (javascript-gensym))
-	 (sequence-value (javascript-gensym)))
-    `(|block| |nil| 
-	      (var ,sequence-value ,sequence)
-	      (for (,idxvar in ,sequence-value)
-		   (block (discard-value (|let| ((,var (ref ,sequence-value ,idxvar))) ,@body))))
-	      ,@(if (needs-value env) '(|undefined|)))))
+         (sequence-value (javascript-gensym)))
+    `(|block| |nil|
+              (var ,sequence-value ,sequence)
+              (for (,idxvar in ,sequence-value)
+                   (block (discard-value (|let| ((,var (ref ,sequence-value ,idxvar))) ,@body))))
+              ,@(if (needs-value env) '(|undefined|)))))
 
 
 
 (define-javascript-macro |doslots| (((name value) sequence) &body body &environment env)
   (let* ((sequence-value (javascript-gensym)))
-    `(|block| |nil| 
-	      (var ,sequence-value ,sequence)
-	      (for (,name in ,sequence-value)
-		   (block (discard-value (|let| ((,value (ref ,sequence-value ,name))) ,@body))))
-	      ,@(if (needs-value env) '(|undefined|)))))
+    `(|block| |nil|
+              (var ,sequence-value ,sequence)
+              (for (,name in ,sequence-value)
+                   (block (discard-value (|let| ((,value (ref ,sequence-value ,name))) ,@body))))
+              ,@(if (needs-value env) '(|undefined|)))))
 
 (define-javascript-macro |while| (condition &body body &environment env)
   `(|block| |nil| (while ,condition (block (discard-value ,@body))) |undefined|))
@@ -290,13 +290,13 @@ don't need to set up all the machinery for returning."
 
 (defun parse-do-variables (variables)
   (flet ((normalize (variable)
-	   (let ((as-cons (if (symbolp variable) (list variable) variable)))
-	     (loop repeat 3 collect (pop as-cons)))))
+           (let ((as-cons (if (symbolp variable) (list variable) variable)))
+             (loop repeat 3 collect (pop as-cons)))))
     (loop for (var init step) in (mapcar #'normalize variables)
-	 collect (list var (or init '|undefined|)) into bindings
-	 when step collect `(|set| ,var ,step) into step-forms
-	 finally (return (values bindings step-forms)))))
-		   
+         collect (list var (or init '|undefined|)) into bindings
+         when step collect `(|set| ,var ,step) into step-forms
+         finally (return (values bindings step-forms)))))
+
 (define-javascript-macro |for| ((var test step) &body body &environment env)
   (if (needs-value env)
     `(|progn|
@@ -311,8 +311,8 @@ don't need to set up all the machinery for returning."
 (define-javascript-macro |ignore-errors| (&body body &environment env)
   (let ((e (javascript-gensym)))
     (if (needs-value env)
-	`((function () (try (return-last ,@body) (catch ,e (return |false|)))))
-	`(try ,@body (catch ,e)))))
+        `((function () (try (return-last ,@body) (catch ,e (return |false|)))))
+        `(try ,@body (catch ,e)))))
 
 (define-javascript-macro |defmethod| ((class name) (&rest parameters) &body body)
   `(|set| (@ ,class |prototype| ,name)  (function ,parameters  (return (|block| ,name ,@body)))))
@@ -328,12 +328,12 @@ don't need to set up all the machinery for returning."
 
 (define-javascript-macro |case| (value &body clauses)
   `(scope ()
-	  (switch 
-	   ,value
-	   ,@(loop for (val . body) in clauses collect
-		  (if (eql val '|t|)
-		    `(:default (return-last ,@body))
-		    `(,val (return-last ,@body)))))))
+          (switch
+           ,value
+           ,@(loop for (val . body) in clauses collect
+                  (if (eql val '|t|)
+                    `(:default (return-last ,@body))
+                    `(,val (return-last ,@body)))))))
 
 (define-javascript-macro |1+| (form)
   `(+ ,form 1))
@@ -354,7 +354,7 @@ don't need to set up all the machinery for returning."
 
 ;; Assignment
 
-(define-javascript-macro |set| (form value) `(monkeylib-foo.javascript:= ,form ,value))
+(define-javascript-macro |set| (form value) `(monkeylib-foo-javascript:= ,form ,value))
 
 (define-javascript-macro |debug| (&rest stuff) `(|alert| (+ ,@stuff)))
 
@@ -375,31 +375,31 @@ don't need to set up all the machinery for returning."
     (symbol thing)))
 
 (define-javascript-macro |xml| (body)
-  (multiple-value-bind (tag attributes body) (monkeylib-foo.xml::parse-cons-form body)
+  (multiple-value-bind (tag attributes body) (monkeylib-foo-xml::parse-cons-form body)
     `(|let*| ((document (|.createDocument| (@ |document| |implementation|) "" ,(case-convert-tag tag) |null|)))
-	     ,@(loop for (name value) on attributes by #'cddr
-		  collect `(|.setAttribute| (@ document |document-element|) ,(case-convert-tag name) ,(attribute-value value)))
-	     ,@(loop for thing in body collect
-		    `(|.appendChild| (@ document |document-element|) (|xml-element| (document) ,thing)))
-	     document)))
+             ,@(loop for (name value) on attributes by #'cddr
+                  collect `(|.setAttribute| (@ document |document-element|) ,(case-convert-tag name) ,(attribute-value value)))
+             ,@(loop for thing in body collect
+                    `(|.appendChild| (@ document |document-element|) (|xml-element| (document) ,thing)))
+             document)))
 
 (define-javascript-macro |xml-element| ((document) body)
   (etypecase body
     (string `(|.create-text-node| ,document ,body))
     (number `(|.create-text-node| |document| (+ "" ,body)))
     (symbol `(|if| (|string=| (|typeof| ,body) "string")
-		   (|.create-text-node| |document| ,body)
-		   ,body))
-    (cons 
+                   (|.create-text-node| |document| ,body)
+                   ,body))
+    (cons
      (cond
        ((sexp-form-p *html* body)
-	(multiple-value-bind (tag attributes body) (monkeylib-foo.xml::parse-cons-form body)
-	  `(|let*| ((element (|.create-element| ,document ,(case-convert-tag tag))))
-		   ,@(loop for (name value) on attributes by #'cddr
-			collect `(|.setAttribute| element ,(case-convert-tag name) ,(attribute-value value)))
-		   ,@(loop for thing in body collect
-			  `(|.appendChild| element (|xml-element| (,document) ,thing)))
-		   element)))
+        (multiple-value-bind (tag attributes body) (monkeylib-foo-xml::parse-cons-form body)
+          `(|let*| ((element (|.create-element| ,document ,(case-convert-tag tag))))
+                   ,@(loop for (name value) on attributes by #'cddr
+                        collect `(|.setAttribute| element ,(case-convert-tag name) ,(attribute-value value)))
+                   ,@(loop for thing in body collect
+                          `(|.appendChild| element (|xml-element| (,document) ,thing)))
+                   element)))
        (t body)))))
 
 (define-javascript-macro |xml-element/cs| ((document) body)
@@ -407,18 +407,18 @@ don't need to set up all the machinery for returning."
     (string `(|.create-text-node| ,document ,body))
     (number `(|.create-text-node| |document| (+ "" ,body)))
     (symbol `(|if| (|string=| (|typeof| ,body) "string")
-		   (|.create-text-node| |document| ,body)
-		   ,body))
-    (cons 
+                   (|.create-text-node| |document| ,body)
+                   ,body))
+    (cons
      (cond
        ((sexp-form-p *html* body)
-	(multiple-value-bind (tag attributes body) (monkeylib-foo.xml::parse-cons-form body)
-	  `(|let*| ((element (|.create-element| ,document ,(string tag))))
-		   ,@(loop for (name value) on attributes by #'cddr
-			collect `(|.setAttribute| element ,(string name) ,(attribute-value value)))
-		   ,@(loop for thing in body collect
-			  `(|.appendChild| element (|xml-element| (,document) ,thing)))
-		   element)))
+        (multiple-value-bind (tag attributes body) (monkeylib-foo-xml::parse-cons-form body)
+          `(|let*| ((element (|.create-element| ,document ,(string tag))))
+                   ,@(loop for (name value) on attributes by #'cddr
+                        collect `(|.setAttribute| element ,(string name) ,(attribute-value value)))
+                   ,@(loop for thing in body collect
+                          `(|.appendChild| element (|xml-element| (,document) ,thing)))
+                   element)))
        (t body)))))
 
 (define-javascript-macro |xml-element/ns| ((document) body)
@@ -426,42 +426,40 @@ don't need to set up all the machinery for returning."
     (string `(|.create-text-node| ,document ,body))
     (number `(|.create-text-node| |document| (+ "" ,body)))
     (symbol `(|if| (|string=| (|typeof| ,body) "string")
-		   (|.create-text-node| |document| ,body)
-		   ,body))
-    (cons 
+                   (|.create-text-node| |document| ,body)
+                   ,body))
+    (cons
      (cond
        ((sexp-form-p *html* body)
-	(multiple-value-bind (tag attributes body) (monkeylib-foo.xml::parse-cons-form body)
-	  `(|let*| ((element (|.create-elementNS| ,document ,(string tag))))
-		   ,@(loop for (name value) on attributes by #'cddr
-			collect `(|.setAttribute| element ,(string name) ,(attribute-value value)))
-		   ,@(loop for thing in body collect
-			  `(|.appendChild| element (|xml-element| (,document) ,thing)))
-		   element)))
+        (multiple-value-bind (tag attributes body) (monkeylib-foo-xml::parse-cons-form body)
+          `(|let*| ((element (|.create-elementNS| ,document ,(string tag))))
+                   ,@(loop for (name value) on attributes by #'cddr
+                        collect `(|.setAttribute| element ,(string name) ,(attribute-value value)))
+                   ,@(loop for thing in body collect
+                          `(|.appendChild| element (|xml-element| (,document) ,thing)))
+                   element)))
        (t body)))))
 
 (define-javascript-macro |html| (body)
   (flet ((attribute-value (thing)
-	   (typecase thing
-	     (string thing)
-	     (number (princ-to-string thing))
-	     (symbol thing))))
+           (typecase thing
+             (string thing)
+             (number (princ-to-string thing))
+             (symbol thing))))
     (etypecase body
       (string `(|.create-text-node| |document| ,body))
       (number `(|.create-text-node| |document| (+ "" ,body)))
       (symbol `(|if| (|string=| (|typeof| ,body) "string")
-		     (|.create-text-node| |document| ,body)
-		     ,body))
-      (cons 
+                     (|.create-text-node| |document| ,body)
+                     ,body))
+      (cons
        (cond
-	 ((sexp-form-p *html* body)
-	  (multiple-value-bind (tag attributes body) (monkeylib-foo.xml::parse-cons-form body)
-	    `(|let*| ((element (|.create-element| |document| ,(case-convert-tag tag))))
-		     ,@(loop for (name value) on attributes by #'cddr
-			  collect `(|.set-attribute| element ,(case-convert-tag name) ,(attribute-value value)))
-		     ,@(loop for thing in body collect
-			    `(|.append-child| element (|html| ,thing)))
-		     element)))
-	 (t body))))))
-    
-	     
+         ((sexp-form-p *html* body)
+          (multiple-value-bind (tag attributes body) (monkeylib-foo-xml::parse-cons-form body)
+            `(|let*| ((element (|.create-element| |document| ,(case-convert-tag tag))))
+                     ,@(loop for (name value) on attributes by #'cddr
+                          collect `(|.set-attribute| element ,(case-convert-tag name) ,(attribute-value value)))
+                     ,@(loop for thing in body collect
+                            `(|.append-child| element (|html| ,thing)))
+                     element)))
+         (t body))))))

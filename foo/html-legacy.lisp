@@ -2,7 +2,7 @@
 ;; Copyright (c) 2005-2007, Peter Seibel All rights reserved.
 ;;
 
-(in-package :monkeylib-foo.xml)
+(in-package :monkeylib-foo-xml)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Public API

@@ -2,22 +2,22 @@
 ;; Copyright (c) 2005, Peter Seibel All rights reserved.
 ;;
 
-(in-package :monkeylib-foo.javascript)
+(in-package :monkeylib-foo-javascript)
 
 (defmacro define-javascript-module (name &body names)
   `(setf (get ',name 'javascript-module) ',names))
 
-(define-javascript-module monkeylib-foo.javascript.special-ops
+(define-javascript-module monkeylib-foo-javascript-special-ops
   array object @ ref new ++ -- ? progn prog block var if
   do-while while for continue break return with switch label
   throw try function
   ;; Unary ops
   delete void typeof ~ !
-  ;; Simple binary ops 
+  ;; Simple binary ops
   * / % + - << >> >>> < > <= >= instanceof in
   == != === !=== & ^ \| && \|\|)
 
-(define-javascript-module monkeylib-foo.javascript.built-in-macros
+(define-javascript-module monkeylib-foo-javascript-built-in-macros
   defun defmethod defvar debug lambda let let* if when unless cond case switch
   dolist dotimes dokids return array autoref autorefset setf defcallback
   destructure html define-builder)
@@ -29,17 +29,17 @@
     (add-mapping sym mappings)))
 
 (defun add-mapping (symbol mappings)
-  (let ((name (intern (string-downcase symbol) :monkeylib-foo.javascript.tokens)))
+  (let ((name (intern (string-downcase symbol) :monkeylib-foo-javascript-tokens)))
     (let ((existing (gethash name mappings)))
-      (if existing 
-	(unless (eql existing symbol)
-	  (error "Already a mapping for ~a to ~a" name existing))
-	(setf (gethash name mappings) symbol)))))
-  
+      (if existing
+        (unless (eql existing symbol)
+          (error "Already a mapping for ~a to ~a" name existing))
+        (setf (gethash name mappings) symbol)))))
+
 (defparameter *default-initial-mappings* (make-hash-table))
 (progn
-  (add-mappings *default-initial-mappings* 'monkeylib-foo.javascript.special-ops)
-  (add-mappings *default-initial-mappings* 'monkeylib-foo.javascript.built-in-macros))
+  (add-mappings *default-initial-mappings* 'monkeylib-foo-javascript-special-ops)
+  (add-mappings *default-initial-mappings* 'monkeylib-foo-javascript-built-in-macros))
 
 (defun resolve-names (thing mappings)
   (cond
@@ -53,8 +53,8 @@
 
 (defmacro with-javascript-input (&body body)
   `(let ((*readtable* (copy-readtable))
-	 (*package* (find-package :monkeylib-foo.javascript.tokens))
-	 (*mappings* (make-hash-table)))
+         (*package* (find-package :monkeylib-foo-javascript-tokens))
+         (*mappings* (make-hash-table)))
      (maphash #'(lambda (k v) (setf (gethash k *mappings*) v)) *default-initial-mappings*)
      (setf (readtable-case *readtable*) :preserve)
      ,@body))
@@ -66,16 +66,16 @@
 (defun emit-javascript (in out)
   (with-javascript-input
     (with-html-output (out :pretty t)
-      (loop with processor = (get-pretty-printer) 
-	 for form = (read in nil in)
-	 while (not (eql form in)) do
-	   (process-javascript processor (resolve-names form *mappings*) :statement)
-	   (newline processor)))))
-      
+      (loop with processor = (get-pretty-printer)
+         for form = (read in nil in)
+         while (not (eql form in)) do
+           (process-javascript processor (resolve-names form *mappings*) :statement)
+           (newline processor)))))
+
 (defun compile-javascript (input &key (output (make-pathname :type "js" :defaults input)))
   (assert (not (equal (pathname input) (pathname output))))
   (let ((*counter* 0))
     (with-open-file (in input)
       (with-open-file (out output :direction :output :if-exists :supersede)
-	(format out "// Generated at ~a from ~a.~2%" (format-iso-8601-time (get-universal-time)) (truename in))
-	(emit-javascript in out)))))
+        (format out "// Generated at ~a from ~a.~2%" (format-iso-8601-time (get-universal-time)) (truename in))
+        (emit-javascript in out)))))

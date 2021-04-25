@@ -2,7 +2,7 @@
 ;; Copyright (c) 2005, Peter Seibel All rights reserved.
 ;;
 
-(in-package :monkeylib-foo.javascript)
+(in-package :monkeylib-foo-javascript)
 
 (defvar *counter* 0)
 
@@ -14,10 +14,10 @@
   (with-output-to-string (out)
     (loop for char across string do
        (cond
-	 ((upper-case-p char) 
-	  (write-char #\- out)
-	  (write-char (char-downcase char) out))
-	 (t (write-char char out))))))
+         ((upper-case-p char)
+          (write-char #\- out)
+          (write-char (char-downcase char) out))
+         (t (write-char char out))))))
 
 (define-javascript-macro defun (name (&rest params) &body body)
   `(function ,name ,params ,@body))
@@ -54,17 +54,17 @@
 ;; (return (let ...)) in addition to the (return ...) within the body
 ;; of the let.
 #+(or)(define-javascript-macro |let| ((&rest bindings) &body body)
-	(let ((params (mapcar #'first bindings))
-	      (values (mapcar #'second bindings)))
-	  `((FUNCTION ,params ,@body) ,@values)))
+        (let ((params (mapcar #'first bindings))
+              (values (mapcar #'second bindings)))
+          `((FUNCTION ,params ,@body) ,@values)))
 
 #+(or)(define-javascript-macro |let*| ((&rest bindings) &body body)
-	(if bindings
-	    `(|let| (,(first bindings)) (|let*| ,(rest bindings) ,@body))
-	    `(PROG ,@body)))
+        (if bindings
+            `(|let| (,(first bindings)) (|let*| ,(rest bindings) ,@body))
+            `(PROG ,@body)))
 
 (define-javascript-macro if (condition then &optional else)
-  (if else 
+  (if else
       `(if ,condition (block ,then) (block ,else))
       `(if ,condition (block ,then))))
 
@@ -77,22 +77,22 @@
 (define-javascript-macro cond (&rest clauses)
   (destructuring-bind ((condition &rest body) &rest rest) clauses
     (if (eql condition '|t|)
-	`(block ,@body)
-	`(if ,condition (block ,@body) ,(when rest `(cond ,@rest))))))
+        `(block ,@body)
+        `(if ,condition (block ,@body) ,(when rest `(cond ,@rest))))))
 
 (define-javascript-macro case (value &rest clauses)
   `(switch ,value
     ,@(loop for (case . body) in clauses collect
-	   (if (eql case '|t|)
-	       `(:default ,@body (break))
-	       `(,case ,@body (break))))))
+           (if (eql case '|t|)
+               `(:default ,@body (break))
+               `(,case ,@body (break))))))
 
 (define-javascript-macro dolist ((var value) &body body)
   `(for ((var ,var) in ,value) (block ,@body)))
 
 (define-javascript-macro dotimes ((var times) &body body)
   `(for ((var (= ,var 0)) (< ,var ,times) (++ ,var :post))
-	(block ,@body)))
+        (block ,@body)))
 
 (define-javascript-macro dokids ((var element) &body body)
   `(for ((var (= ,var (@ ,element |firstChild|))) (!= ,var |null|) (= ,var (@ ,var |nextSibling|)))
@@ -101,12 +101,12 @@
 (define-javascript-macro autoref (start &rest indices)
   (if (rest indices)
     (let ((tmp (javascript-gensym "tmp")))
-      `((FUNCTION () 
+      `((FUNCTION ()
         (let ((,tmp (ref ,start ,(first indices))))
           (when (== ,tmp |null|)
             (= ,tmp (new |Array|))
-	    (= (ref ,start ,(first indices)) ,tmp))
-	  (return (autoref (ref ,start ,(first indices)) ,@(rest indices)))))))
+            (= (ref ,start ,(first indices)) ,tmp))
+          (return (autoref (ref ,start ,(first indices)) ,@(rest indices)))))))
     `(ref ,start ,(first indices))))
 
 (define-javascript-macro autorefset (value start &rest indices)
@@ -115,15 +115,15 @@
       `(let ((,tmp (ref ,start ,(first indices))))
           (when (== ,tmp |null|)
             (= ,tmp (new |Array|))
-	    (= (ref ,start ,(first indices)) ,tmp))
-	  (autorefset ,value (ref ,start ,(first indices)) ,@(rest indices))))
+            (= (ref ,start ,(first indices)) ,tmp))
+          (autorefset ,value (ref ,start ,(first indices)) ,@(rest indices))))
     `(= (ref ,start ,(first indices)) ,value)))
 
 (define-javascript-macro setf (form value)
   (if (and (consp form) (eql (car form) 'autoref))
     `(autorefset ,value ,@(rest form))
     `(= ,form ,value)))
-  
+
 
 (define-javascript-macro defcallback (name (event &rest params) &body body)
   `(defun ,name (,@params)
@@ -146,9 +146,9 @@
     ((cons-form-p tree)
      (multiple-value-bind (tag attributes body) (parse-cons-form tree)
        (case tag
-	 (:text (list `(,counter text ,(second tree))))
-	 (:node (list `(,counter code ,(second tree))))
-	 (t (cons `(,counter element ,tag ,attributes) (mapcan #'(lambda (x) (find-elements x (1+ counter))) body))))))
+         (:text (list `(,counter text ,(second tree))))
+         (:node (list `(,counter code ,(second tree))))
+         (t (cons `(,counter element ,tag ,attributes) (mapcan #'(lambda (x) (find-elements x (1+ counter))) body))))))
     ((consp tree) ;; non FOO cons forms
      (list `(,counter code ,tree)))
     (t
@@ -156,16 +156,16 @@
 
 (defun tree-builder (tree)
   (flet ((genvar (x c)
-	   (intern (format nil "~(~a~)~d" x c) :keyword)))
+           (intern (format nil "~(~a~)~d" x c) :keyword)))
   (let ((elements (find-elements tree)))
     (loop for counter from 1
-       for (depth type value attributes) in elements 
+       for (depth type value attributes) in elements
        for var = (genvar (ecase type (element value) (text "text") (code "value")) counter)
        collect `(,depth ,var) into tree-stack
        if (eql type 'element)
        nconc `((var ,var ((@ |document| |createElement|) ,(string-downcase value)))
-	       ,@(loop for (k v) on attributes by #'cddr collect
-		      `((@ ,var |setAttribute|) ,(string-downcase k) ,v)))
+               ,@(loop for (k v) on attributes by #'cddr collect
+                      `((@ ,var |setAttribute|) ,(string-downcase k) ,v)))
        into code
        else if (eql type 'text)
        nconc `((var ,var ((@ |document| |createTextNode|) ,value))) into code
@@ -180,9 +180,3 @@
      when stack collect `((@  ,(second (car stack)) |appendChild|) ,(second entry)) into code
      do (push entry stack)
        finally (return (nconc code `((return ,(second (car (last stack)))))))))
-
-
-
-
-      
-

@@ -1,4 +1,4 @@
-(in-package :monkeylib-markup.html.handy-tags)
+(in-package :monkeylib-markup-html-handy-tags)
 
 ;;;
 ;;; FIXME: Some of this stuff should be moved out of monkeylib as it's
@@ -14,7 +14,7 @@
 (defparameter *asins*
   (progn
     (let ((ht (make-hash-table :test #'equal)))
-      (loop for (k v) in 
+      (loop for (k v) in
            '(("Peopleware" "0932633439")
              ("Practical Common Lisp" "1590592395")
              ("Rapid Development" "1556159005")

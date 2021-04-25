@@ -2,7 +2,7 @@
 ;; Copyright (c) 2005, Peter Seibel All rights reserved.
 ;;
 
-(in-package :monkeylib-foo.language)
+(in-package :monkeylib-foo-language)
 
 ;;; Hmmmm. Might be useful to support symbol macros.
 

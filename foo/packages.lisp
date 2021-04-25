@@ -4,7 +4,7 @@
 
 (in-package :cl-user)
 
-(defpackage :monkeylib-foo.text-output
+(defpackage :monkeylib-foo-text-output
   (:use :cl)
   (:export
    :*pretty*
@@ -24,10 +24,10 @@
    :unindent
    :with-foo-output))
 
-(defpackage :monkeylib-foo.language
+(defpackage :monkeylib-foo-language
   (:use :cl
         :monkeylib-utilities
-        :monkeylib-foo.text-output)
+        :monkeylib-foo-text-output)
   (:export
    :case-preserving-readtable
    :comment
@@ -61,11 +61,11 @@
    :special-operator-symbol
    :top-level-environment))
 
-(defpackage :monkeylib-foo.xml
+(defpackage :monkeylib-foo-xml
   (:use :common-lisp
         :monkeylib-utilities
-        :monkeylib-foo.text-output
-        :monkeylib-foo.language
+        :monkeylib-foo-text-output
+        :monkeylib-foo-language
         :monkeylib-test
         :monkeylib-pathnames)
   (:export
@@ -85,22 +85,22 @@
    :xhtml
    :xml))
 
-(defpackage :monkeylib-foo.css
+(defpackage :monkeylib-foo-css
   (:use :common-lisp
         :monkeylib-utilities
-        :monkeylib-foo.text-output
-        :monkeylib-foo.language)
+        :monkeylib-foo-text-output
+        :monkeylib-foo-language)
   (:export
    :emit-css
    :css))
 
 (defpackage :monkeylib-foo
   (:use :common-lisp
-        :monkeylib-foo.xml
-        :monkeylib-foo.css
+        :monkeylib-foo-xml
+        :monkeylib-foo-css
         :monkeylib-utilities
-        :monkeylib-foo.text-output
-        :monkeylib-foo.language)
+        :monkeylib-foo-text-output
+        :monkeylib-foo-language)
   (:export
    :&attributes
    :compile-javascript
@@ -130,12 +130,12 @@
    :with-html-to-file
    :xml))
 
-(defpackage monkeylib-foo.javascript
+(defpackage monkeylib-foo-javascript
   (:use :common-lisp
         :monkeylib-foo
         :monkeylib-utilities
-        :monkeylib-foo.text-output
-        :monkeylib-foo.language)
+        :monkeylib-foo-text-output
+        :monkeylib-foo-language)
   (:export
    :javascript
    :define-javascript-macro
@@ -215,19 +215,19 @@
    :with))
 
 
-(defpackage monkeylib-foo.lispscript
+(defpackage monkeylib-foo-lispscript
   (:use :common-lisp
-        :monkeylib-foo.language
-        :monkeylib-foo.javascript)
+        :monkeylib-foo-language
+        :monkeylib-foo-javascript)
   (:shadow :=)
   (:export :*lispscript*))
 
 
-(defpackage monkeylib-foo.lispscript-tests
+(defpackage monkeylib-foo-lispscript-tests
   (:use :common-lisp
         :monkeylib-foo
-        :monkeylib-foo.xml
-        :monkeylib-foo.javascript
-        :monkeylib-foo.lispscript))
+        :monkeylib-foo-xml
+        :monkeylib-foo-javascript
+        :monkeylib-foo-lispscript))
 
-(defpackage monkeylib-foo.javascript.tokens (:use))
+(defpackage monkeylib-foo-javascript-tokens (:use))

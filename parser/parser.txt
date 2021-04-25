@@ -41,7 +41,7 @@ By default, the parser doesn't capture anything. It just parses the
 string and returns (values t nil) if it parses correctly and (values
 nil nil) if it doesn't. If you want the parser function to return
 something in the secondary return value you need to include some
-^-expression in the parser grammar. 
+^-expression in the parser grammar.
 
 (defparser p (^ foo))
 
@@ -59,13 +59,13 @@ something in the secondary return value you need to include some
 (^ "string")       => "string"
 (^ (g1 g2 ... gn)) => (list (^ g1) (^ g2) ... (^ gn))
 (^ (* grammar))    => (list of each match of (^ grammar))
-(^ 
+(^
 
 
 (^ foo) -- depends on foo. If foo doesn't contain any ^ values then
 the value of this expression is simply the string matched by foo.
 However if foo uses ^ to set its own value then (^ foo) returns that
-value. 
+value.
 
  (let ((start current-index))
    (foo)
@@ -78,7 +78,7 @@ value.
 
 chartype prods: can save last character without consing
 prods that match a single string: can save the string into the prod var
-prods that match a complex grammar: Silly to save the string, 
+prods that match a complex grammar: Silly to save the string,
 
 
 Option one: every grammar sets last-match to something on a successful
@@ -90,12 +90,12 @@ the default
 Option two: an un-annotated grammar (no ^'s) returns (values t nil) on
 a successful parse. In order to make the second return value be
 non-nil you need to add some ^'s around something in the top-level
-grammar. 
+grammar.
 
 
 
 Default behavior for a parser is to return t or nil as it's primary
-value and any saved values as its secondary value. 
+value and any saved values as its secondary value.
 
 
 SYNTAX:
@@ -134,7 +134,7 @@ lisp-escape  := !lisp-form
 value-caupture  := (^ grammar [lisp-form])
 
 
-SYMANTICS:
+SEMANTICS:
 
 symbol ...... Match a named production. After a successful match the variable
               of the same name holds the value of the match.
@@ -161,11 +161,11 @@ sequence .... Matches if each expression matches in turn. The natural
 ?-expression  Zero or one matches of an expression. The natural value
               is the natural value of expression.
 
-/-expression  Matches if any of the expressions match, starting from the 
+/-expression  Matches if any of the expressions match, starting from the
               same position. The natural value is the value of the
               first matching expression.
 
-&-expression  Matches if all of the expressions match, starting from the 
+&-expression  Matches if all of the expressions match, starting from the
               same position. The natural value is the value of the
               first matching expression. Mostly (only?) used where one
               of the alternatives is a ~-expression. For
@@ -269,7 +269,7 @@ used in a production
 (flet ((prod ()
          (let ((start index) (result nil))
            (and
-             (or 
+             (or
                (not (do () (not (and (foo) (progn (push foo result) t)))))
       (rollback start))
     (setq production-name result)))
@@ -282,9 +282,9 @@ used in a production
   (1* (^ (digit) (+ (* 10 (or number 0)) (atoi digit)))))
 
 (let ((start index) (result nil))
-  (or (and 
+  (or (and
        (symbol-macrolet ((number result))
-         (and 
+         (and
           (and (digit) (+ (* 10 (or number 0)) (atoi digit)))
           (not
            (do () (not

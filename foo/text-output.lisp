@@ -2,7 +2,7 @@
 ;; Copyright (c) 2005, Peter Seibel All rights reserved.
 ;;
 
-(in-package :monkeylib-foo.text-output)
+(in-package :monkeylib-foo-text-output)
 
 (defvar *pretty* t
   "Controls whether output is generated with indentation and
@@ -19,7 +19,7 @@
 
 (defmacro with-foo-output ((stream &key (pretty *pretty*)) &body body)
   `(let* ((*text-output* ,stream)
-	  (*text-pretty-printer* nil)
+          (*text-pretty-printer* nil)
           (*pretty* ,pretty))
     ,@body))
 
@@ -41,7 +41,7 @@
 
 (defgeneric newline (processor)
   (:documentation "Unconditionally emit a newline."))
-  
+
 (defgeneric freshline (processor)
   (:documentation "Emit a newline unless the last character emitted was a newline."))
 
@@ -81,15 +81,15 @@
     (emit-newline (printer pp))))
 
 (defmethod indent ((pp text-pretty-printer))
-  (when *pretty* 
+  (when *pretty*
     (incf (indentation (printer pp)) (tab-width pp))))
 
 (defmethod unindent ((pp text-pretty-printer))
-  (when *pretty* 
+  (when *pretty*
     (decf (indentation (printer pp)) (tab-width pp))))
 
 (defmethod toggle-indenting ((pp text-pretty-printer))
-  (when *pretty* 
+  (when *pretty*
     (with-slots (indenting-p) (printer pp)
       (setf indenting-p (not indenting-p)))))
 
@@ -103,7 +103,7 @@
   (or *text-pretty-printer* (new-pretty-printer)))
 
 (defun new-pretty-printer ()
-  (make-instance 
+  (make-instance
     'text-pretty-printer
     :printer (make-instance 'indenting-printer :out *text-output*)))
 
@@ -118,7 +118,7 @@
 
 (defmethod newline ((compiler text-compiler))
   (push-op '(:newline) (ops compiler)))
-  
+
 (defmethod freshline ((compiler text-compiler))
   (push-op '(:freshline) (ops compiler)))
 
@@ -150,14 +150,14 @@
 (defun optimize-static-output (ops)
   (let ((new-ops (make-op-buffer)))
     (with-output-to-string (buf)
-      (flet ((add-op (op) 
+      (flet ((add-op (op)
                (compile-buffer buf new-ops)
                (push-op op new-ops)))
         (loop for op across ops do
              (ecase (first op)
                (:raw-string (write-sequence (second op) buf))
                ((:newline :embed-value :embed-code) (add-op op))
-	       (:freshline (add-op (if *pretty* op '(:newline))))
+               (:freshline (add-op (if *pretty* op '(:newline))))
                ((:indent :unindent :toggle-indenting)
                 (when *pretty* (add-op op)))))
         (compile-buffer buf new-ops)))
@@ -185,7 +185,7 @@
 (defmethod op->code ((op (eql :newline)) &rest operands)
   (if *pretty*
     `(newline *text-pretty-printer*)
-    `(write-char #\Newline *text-output*)))    
+    `(write-char #\Newline *text-output*)))
 
 (defmethod op->code ((op (eql :freshline)) &rest operands)
   (if *pretty*
@@ -258,4 +258,3 @@
 (defun make-op-buffer () (make-array 10 :adjustable t :fill-pointer 0))
 
 (defun push-op (op ops-buffer) (vector-push-extend op ops-buffer))
-

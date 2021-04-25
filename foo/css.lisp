@@ -2,7 +2,7 @@
 ;; Copyright (c) 2005, Peter Seibel All rights reserved.
 ;;
 
-(in-package :monkeylib-foo.css)
+(in-package :monkeylib-foo-css)
 
 (defclass css (language)
   ()
@@ -19,8 +19,8 @@
     (with-open-file (*text-output* output :direction :output :if-exists :supersede)
       (format *text-output* "/* Generated at ~a from ~a. */~2%" (format-iso-8601-time (get-universal-time)) (truename in))
       (loop for form = (read in nil in)
-	 while (not (eql form in)) do
-	   (emit-css form)))))
+         while (not (eql form in)) do
+           (emit-css form)))))
 
 (defun emit-css (sexp) (emit-for-language 'css sexp))
 
@@ -49,7 +49,7 @@
      (raw-string processor (string-downcase (princ-to-string form)) t))
     ((eql (first form) :import)
      (emit-css-import processor form))
-    (t 
+    (t
      (process-non-import-css language processor form))))
 
 (defun emit-css-import (processor sexp)

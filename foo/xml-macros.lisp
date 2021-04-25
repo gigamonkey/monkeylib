@@ -2,15 +2,15 @@
 ;; Copyright (c) 2005-2007, Peter Seibel All rights reserved.
 ;;
 
-(in-package :monkeylib-foo.xml)
+(in-package :monkeylib-foo-xml)
 
 (define-xml-macro :? (name &rest attrs)
-  `(:progn 
+  `(:progn
     (:noescape (:format "<?~(~a~) ~@{~(~a~)=\"~a\"~^ ~}?>" ,name ,@attrs))
     (:newline)))
 
 (define-html-macro :? (name &rest attrs)
-  `(:progn 
+  `(:progn
     (:noescape (:format "<?~a ~@{~(~a~)=\"~a\"~^ ~}?>" ,name ,@attrs))
     (:newline)))
 
@@ -21,5 +21,3 @@
 
 (define-xml-macro :character (name)
   `(:noescape (:format ,(if (numberp name) "&#~d;" "&~(~a~);") ,name)))
-
-

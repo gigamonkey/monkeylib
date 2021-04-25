@@ -10,7 +10,7 @@
         :monkeylib-pathnames
         :monkeylib-utilities
         :monkeylib-markup
-        :monkeylib-markup.html)
+        :monkeylib-markup-html)
   (:import-from :alexandria :compose)
   (:export
    :show-cuts))

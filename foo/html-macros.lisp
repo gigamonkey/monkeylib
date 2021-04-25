@@ -2,9 +2,9 @@
 ;; Copyright (c) 2005, Peter Seibel All rights reserved.
 ;;
 
-(in-package :monkeylib-foo.xml)
+(in-package :monkeylib-foo-xml)
 
-(defvar *css* (make-instance 'monkeylib-foo.css::css))
+(defvar *css* (make-instance 'monkeylib-foo-css::css))
 
 (define-html-macro :comment (&body body)
   `(:progn
@@ -18,7 +18,7 @@
   `(:noescape (:format ,(if (numberp name) "&#~d;" "&~(~a~);") ,name)))
 
 (define-html-macro :pi (name &rest attrs)
-  `(:progn 
+  `(:progn
     (:noescape (:format "<?~a ~@{~(~a~)=\"~a\"~^ ~}?>" ,name ,@attrs))
     (:newline)))
 
@@ -42,7 +42,7 @@
 
 (define-html-macro :css (&body body)
   `((:style :type "text/css")
-    (:comment 
+    (:comment
      (:with-language (*css*)
        ,@body))))
 
@@ -53,11 +53,10 @@
 (define-html-macro :lispscript (&body body)
   `((:script :type "text/javascript")
     (:comment
-     (:with-language (monkeylib-foo.lispscript::*lispscript*)
+     (:with-language (monkeylib-foo-lispscript::*lispscript*)
        ,@body))))
 
 (defparameter *interpolated-foo* '((:title . "My TITLE")))
 
 (define-html-macro :interpolate (name)
   (cdr (assoc name *interpolated-foo*)))
-

@@ -4,9 +4,9 @@
 
 (in-package :cl-user)
 
-(defpackage :monkeylib-markup.xml
+(defpackage :monkeylib-markup-xml
   (:use :common-lisp
         :monkeylib-markup
         :monkeylib-utilities
         :monkeylib-foo
-        :monkeylib-foo.xml))
+        :monkeylib-foo-xml))
