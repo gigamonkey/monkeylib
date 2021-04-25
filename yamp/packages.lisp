@@ -41,6 +41,6 @@
    :_
    :->
    :=>)
-  (:import-from :monkeylib-macro-utilities :gensyms)
+  (:import-from :alexandria :with-gensyms)
   (:import-from :monkeylib-text-output :with-text-output)
   (:shadow :!))

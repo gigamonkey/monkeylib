@@ -19,6 +19,7 @@
    (:file "tests"       :depends-on ("packages" "markup")))
   :depends-on
   (:cl-ppcre
+   :alexandria
    :monkeylib-json
    :monkeylib-macro-utilities
    :monkeylib-pathnames

@@ -354,7 +354,7 @@ values returned by P."
 ;;; Tracing helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
 ;;; Sometimes it's useful to trace the behavior of a grammar. These functions
-;;; allow you to annotate your grammer with (trace ...) and (tracing ...) forms
+;;; allow you to annotate your grammar with (trace ...) and (tracing ...) forms
 ;;; to trace specific parts of the grammar and to turn tracing on in particular
 ;;; dynamic scopes.
 

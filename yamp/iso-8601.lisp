@@ -81,13 +81,16 @@
 
   (minute (number-between 2 0 59))
 
-  (ss (number-between 2 0 66))
+  (ss (number-between 2 0 60)) ;; 60 for leap seconds
 
   (sss (or "." ",") (=> (many1 digit) (parse-integer (concatenate 'string _))))
 
   (digit (? any-char #'digit-char-p))
 
   ((number ds)
+   ;; Could this be rewritten?
+   ;;  (=> (text (counted ds digit)) (parse-integer _)))
+   ;; Likewise for sss rule above.
    (=> (counted ds digit) (parse-integer (concatenate 'string _))))
 
   ((number-between ds min max)
