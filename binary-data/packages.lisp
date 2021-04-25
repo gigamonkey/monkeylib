@@ -18,7 +18,7 @@
            :current-binary-object
            :+null+))
 
-(defpackage :monkeylib-binary-data.common-datatypes
+(defpackage :monkeylib-binary-data-common-datatypes
   (:use :common-lisp :monkeylib-binary-data)
   (:export
    :u1

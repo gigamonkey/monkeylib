@@ -55,14 +55,14 @@
 (defpackage :monkeylib-css
   (:use :cl :monkeylib-parser))
 
-(defpackage :monkeylib-parser.dot-parser
+(defpackage :monkeylib-parser-dot-parser
   (:use :cl :monkeylib-parser
-	:monkeylib-utilities)
+        :monkeylib-utilities)
   (:shadowing-import-from :monkeylib-parser :!)
   (:shadow :string))
 
-(defpackage :monkeylib-parser.time-period-parser
+(defpackage :monkeylib-parser-time-period-parser
   (:use :cl :monkeylib-parser
-	:monkeylib-utilities)
+        :monkeylib-utilities)
   (:shadowing-import-from :monkeylib-parser :!)
   (:shadow :step :time))
