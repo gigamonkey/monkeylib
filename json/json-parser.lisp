@@ -1,10 +1,10 @@
-(in-package :monkeylib-ajax.json-parser)
+(in-package :monkeylib-json-parser)
 
 ;; Parser for JSON syntax (<http://www.json.org/>)
 
 (defchartype string-char '(not (member #\\ #\")))
 
-(defchartype digit1-9 
+(defchartype digit1-9
   '(member #\1 #\2 #\3 #\4 #\5 #\6 #\7 #\8 #\9))
 
 (defchartype digit
@@ -23,7 +23,7 @@
 
 (defprod key-value-pair () (string ws ":" ws value))
 
-(defprod array () 
+(defprod array ()
   ("[" ws (? value) (* ws "," ws value) ws "]"))
 
 (defprod value ()
@@ -52,5 +52,4 @@
 (defmacro tjp (production input)
   `((lambda (x)
       (parselet ((foo (^ ,production)))
-	(foo x))) ,input))
-     
+        (foo x))) ,input))
