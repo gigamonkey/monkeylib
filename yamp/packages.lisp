@@ -4,11 +4,11 @@
 
 (in-package :cl-user)
 
-(defpackage :com.gigamonkeys.yamp
+(defpackage :monkeylib-yamp
   (:use :common-lisp
-        :com.gigamonkeys.json
-        :com.gigamonkeys.pathnames
-        :com.gigamonkeys.utilities)
+        :monkeylib-json
+        :monkeylib-pathnames
+        :monkeylib-utilities)
   (:export
 
    ;; Markup
@@ -41,6 +41,6 @@
    :_
    :->
    :=>)
-  (:import-from :com.gigamonkeys.macro-utilities :gensyms)
+  (:import-from :monkeylib-macro-utilities :gensyms)
   (:import-from :monkeylib-text-output :with-text-output)
   (:shadow :!))

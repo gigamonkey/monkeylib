@@ -6,7 +6,7 @@
 
 ;; Functions for manipulating trees prior to rendering.
 
-(in-package :com.gigamonkeys.yamp)
+(in-package :monkeylib-yamp)
 
 (defun >>> (&rest fn)
   "Reverse order version of COMPOSE."

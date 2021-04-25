@@ -1,4 +1,4 @@
-(in-package :com.gigamonkeys.yamp)
+(in-package :monkeylib-yamp)
 
 (defun parse-iso-8601 (text)
   (multiple-value-bind (ok result) (iso-8601 (cons text 0))

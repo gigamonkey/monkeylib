@@ -2,7 +2,7 @@
 ;; Copyright (c) 2017, Peter Seibel. All rights reserved.
 ;;
 
-(in-package :com.gigamonkeys.yamp)
+(in-package :monkeylib-yamp)
 
 (defun run-tests (dir &key (verbose t) (quiet t) (stop t))
   (let ((run 0)

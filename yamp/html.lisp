@@ -4,7 +4,7 @@
 ;; Copyright (c) 2017, Peter Seibel. All rights reserved.
 ;;
 
-(in-package :com.gigamonkeys.yamp)
+(in-package :monkeylib-yamp)
 
 (defun generate-html (file)
   "Generate HTML for the markup file in the same location except with an .html

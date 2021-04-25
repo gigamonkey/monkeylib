@@ -2,8 +2,8 @@
 ;; Copyright (c) 2017, Peter Seibel. All rights reserved.
 ;;
 
-(defsystem com.gigamonkeys.yamp
-  :name "com.gigamonkeys.yamp"
+(defsystem monkeylib-yamp
+  :name "monkeylib-yamp"
   :description "Yet Another Markup Parser."
   :components
   ((:file "packages")
@@ -19,8 +19,8 @@
    (:file "tests"       :depends-on ("packages" "markup")))
   :depends-on
   (:cl-ppcre
-   :com.gigamonkeys.json
-   :com.gigamonkeys.macro-utilities
-   :com.gigamonkeys.pathnames
-   :com.gigamonkeys.utilities
+   :monkeylib-json
+   :monkeylib-macro-utilities
+   :monkeylib-pathnames
+   :monkeylib-utilities
    :monkeylib-html))

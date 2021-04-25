@@ -1,8 +1,8 @@
 ;;
-;; Copyright (c) 2005, 2017, Gigamonkeys Consulting All rights reserved.
+;; Copyright (c) 2005, 2017, Peter Seibel. All rights reserved.
 ;;
 
-(in-package :com.gigamonkeys.yamp)
+(in-package :monkeylib-yamp)
 
 (defvar *tex-preamble* nil)
 (defvar *tex-postamble* nil)

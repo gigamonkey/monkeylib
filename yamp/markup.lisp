@@ -4,7 +4,7 @@
 ;; Copyright (c) 2017, Peter Seibel. All rights reserved.
 ;;
 
-(in-package :com.gigamonkeys.yamp)
+(in-package :monkeylib-yamp)
 
 (defun markup (text)
   "Parse a string containing markup. If the markup uses subdoc tags,

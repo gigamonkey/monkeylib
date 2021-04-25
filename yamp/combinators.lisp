@@ -4,7 +4,7 @@
 ;; Copyright (c) 2017, Peter Seibel. All rights reserved.
 ;;
 
-(in-package :com.gigamonkeys.yamp)
+(in-package :monkeylib-yamp)
 
 (defterm counted (n p)
   "Match P N times. Return a list of values matched by P."

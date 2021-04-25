@@ -4,7 +4,7 @@
 ;; Copyright (c) 2017, Peter Seibel. All rights reserved.
 ;;
 
-(in-package :com.gigamonkeys.yamp)
+(in-package :monkeylib-yamp)
 
 (defparser markup-lite (&state subdocs (indent 0) (so-far 0) (subdoc-level 0))
 

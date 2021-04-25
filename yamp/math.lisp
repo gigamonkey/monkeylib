@@ -1,4 +1,4 @@
-(in-package :com.gigamonkeys.yamp)
+(in-package :monkeylib-yamp)
 
 (defparser math ()
 

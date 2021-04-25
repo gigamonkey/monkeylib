@@ -1,4 +1,4 @@
-(in-package :com.gigamonkeys.yamp)
+(in-package :monkeylib-yamp)
 
 (defun m (s)
   (nth-value 1 (math (cons s 0))))
