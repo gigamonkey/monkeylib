@@ -20,7 +20,7 @@ extension."
         (namestring (truename output-file))))))
 
 (defun html-filename (file)
-  "Translate filenae of Markup file to the HTML file to be generated and load
+  "Translate filename of Markup file to the HTML file to be generated and load
 the corresponding config file."
   (let ((config (load-config file)))
     (when config

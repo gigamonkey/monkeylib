@@ -1,4 +1,4 @@
-;;; Copyright (c) 2005-2001, Peter Seibel.
+;;; Copyright (c) 2005-2021, Peter Seibel.
 ;;; All rights reserved. See LICENSE for details.
 
 (in-package :monkeylib-text-languages)
@@ -187,13 +187,13 @@ characters will need their own specializations of this method."
                      (destructuring-bind (,@parameters) (rest ,whole)
                        ,@body)
                    (error (e)
-                     (error 'foo-syntax-error :form ,whole :cause e)))))))))
+                     (error 'syntax-error :form ,whole :cause e)))))))))
 
-(define-condition foo-syntax-error ()
+(define-condition syntax-error ()
   ((form :initarg :form :accessor form-of)
    (cause :initarg :cause :accessor cause-of :initform nil)))
 
-(defmethod print-object ((c foo-syntax-error) stream)
+(defmethod print-object ((c syntax-error) stream)
   (print-unreadable-object (c stream)
     (format stream "in form: ~s; caused by: ~a" (form-of c) (cause-of c))))
 
@@ -209,7 +209,7 @@ characters will need their own specializations of this method."
                        (declare (ignore ,namevar))
                        ,@body)
                    (error (e)
-                     (error 'foo-syntax-error :form ,whole :cause e)))))))))
+                     (error 'syntax-error :form ,whole :cause e)))))))))
 
 (defun parse-&environment (parameters)
   "Parse out an optional &environment parameter and return the

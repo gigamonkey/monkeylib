@@ -11,17 +11,17 @@
    :case-preserving-readtable
    :comment
    :compile-special-op-body
-   :define-macro
-   :define-special-operator
    :define-language
    :define-language-macro
+   :define-macro
+   :define-special-operator
    :embeddable-value-form
    :emit
    :emit-for-language
    :environment
    :expand-macro-form
    :fully-expand-macro-form
-   :foo-syntax-error
+   :generate
    :identifier
    :input-package
    :input-readtable
@@ -38,12 +38,5 @@
    :sexp-form-p
    :special-form-p
    :special-operator-symbols
-   :top-level-environment
-
-   ;; Don't like these names. Should probably be a single GF named
-   ;; generate specializing on the input and output
-   :generate-from-file
-   :generate-from-string
-   :generate-from/to-streams
-   :generate-from-sexp
-))
+   :syntax-error
+   :top-level-environment))
