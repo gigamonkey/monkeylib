@@ -1,28 +1,28 @@
 (in-package :monkeylib-prose-diff)
 
-(defun lcs (a b)
+(defun lcs (a b &key (test #'eql))
   "Compute the longest common subsequence of vectors `a' and `b'"
-  (map 'vector (lambda (i) (aref a i)) (lcs-positions a b)))
+  (map 'vector (lambda (i) (aref a i)) (lcs-positions a b :test test)))
 
-(defun lcs-length (a b)
+(defun lcs-length (a b &key (test #'eql))
   "Compute the length of the longest common subsequence of vectors `a' and `b'"
-  (multiple-value-bind (table m n) (%lcs-table a b)
+  (multiple-value-bind (table m n) (%lcs-table a b :test test)
     (aref table n m)))
 
-(defun lcs-positions (a b)
+(defun lcs-positions (a b &key (test #'eql))
   "Find the indices in a and b of the elements of the LCS."
-  (multiple-value-bind (table m n) (%lcs-table a b)
+  (multiple-value-bind (table m n) (%lcs-table a b :test test)
     (let* ((len (aref table n m))
            (a-indices (make-array len))
            (b-indices (make-array len))
            (idx (1- len))
            (i (length a))
            (j (length b)))
-    
+
     (loop while (> (aref table j i) 0) do
          (let* ((current (aref table j i))
                 (previous (1- current)))
-           
+
            (cond
              ((and (= previous (aref table (1- j) (1- i)))
                    (= previous (aref table j (1- i)))
@@ -37,7 +37,7 @@
              (t (error "Assertion gone haywire: ~s ~s" j i)))))
     (values a-indices b-indices))))
 
-(defun %lcs-table (a b)
+(defun %lcs-table (a b &key (test #'eql))
   "Compute the MxN table from which we can extract the LCS, and a
 bunch of other good stuff."
   (let* ((m (length a))
@@ -46,7 +46,7 @@ bunch of other good stuff."
 
     (flet ((lcs-length (j i)
              (cond
-               ((eql (aref a (1- i)) (aref b (1- j)))
+               ((funcall test (aref a (1- i)) (aref b (1- j)))
                 (+ 1 (aref table (1- j) (1- i))))
                (t
                 (max (aref table (1- j) i) (aref table j (1- i)))))))
@@ -66,4 +66,3 @@ average of the ratios of the length of the LCS to their length."
 (defun one-way-similarity (a b)
   "Like `similarity' but in only one direction."
   (float (/ (lcs-length a b) (length a)) 0d0))
-

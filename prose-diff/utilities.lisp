@@ -2,7 +2,7 @@
 
 ;;; Bits of utility code that perhaps should be moved into
 ;;; monkeylib-utilities or replaced with calls to equivalent
-;;; bits o fsome standard utility library.
+;;; bits of some standard utility library.
 
 (defun maximum (list &key (key #'identity))
   (when list
