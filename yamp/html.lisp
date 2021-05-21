@@ -1,15 +1,18 @@
 ;; -*- fill-column: 80; -*-
 
 ;;
-;; Copyright (c) 2017, Peter Seibel. All rights reserved.
+;; Copyright (c) 2017-2021, Peter Seibel. All rights reserved.
 ;;
 
 (in-package :monkeylib-yamp)
 
+(defvar *input-file*)
+
 (defun generate-html (file)
   "Generate HTML for the markup file in the same location except with an .html
 extension."
-  (let ((*default-pathname-defaults* (parent-directory file)))
+   (let ((*default-pathname-defaults* (parent-directory file))
+         (*input-file* file))
     (multiple-value-bind (output-file config) (html-filename file)
       (when output-file
         (with-output-to-file (out (ensure-directories-exist output-file))
@@ -22,17 +25,40 @@ extension."
 (defun html-filename (file)
   "Translate filename of Markup file to the HTML file to be generated and load
 the corresponding config file."
-  (let ((config (load-config file)))
+  (multiple-value-bind (config config-file) (load-config file)
     (when config
-      (let ((root-dir (merge-pathnames (first (config :directory config)) file))
-            (dir (first (last (pathname-directory file))))
-            (name (pathname-name file)))
-        (values
-         (make-pathname :name (if (string= name dir) "index" name)
-                        :type "html"
-                        :directory `(,@(pathname-directory root-dir) ,dir))
+      (let* ((root (parent-directory config-file))
+             (enough (rest (pathname-directory (enough-namestring file root))))
+             (html-file (funcall (filename-function config) file config enough)))
+        (values (merge-pathnames html-file root) config)))))
 
-         config)))))
+(defun filename-function (config)
+  (let ((style (first (config :filename-style config))))
+    (if (eql style :directory) #'html-filename/directory #'html-filename/file)))
+
+(defun html-filename/file (file config enough)
+  "Translate filename of Markup file to the HTML file to be generated and load
+the corresponding config file."
+  (let ((name (pathname-name file))
+        (dirs `(:relative ,@(config :directory config) ,@enough)))
+    (make-pathname
+     :name (if (string= name (first (last dirs))) "index" name)
+     :type "html"
+     :directory dirs
+     :defaults file)))
+
+
+(defun html-filename/directory (file config enough)
+  "Translate filename of Markup file to the HTML file to be generated and load
+the corresponding config file."
+  (let* ((name (pathname-name file))
+         (dirs `(:relative ,@(config :directory config) ,@enough ,@(if (string= name "index") () `(,name)))))
+    (make-pathname
+     :name (if (string= name (first (last dirs))) "index" name)
+     :type "html"
+     :directory dirs
+     :defaults file)))
+
 
 (defun markup-html (doc config)
   "Transform the tree produced by the Markup parser into a Monkeylib HTML tree."
@@ -46,7 +72,6 @@ the corresponding config file."
 
           ;; Special section rewriters
           (section-rewriters config)
-
 
           (rewriter :§ (replacing-with (first (config :section-marker config))))
           (rewriter :blank (replacing-with (first (config :blank config))))
@@ -114,7 +139,7 @@ the corresponding config file."
                              (dolist (clause rest) (add-clause clause))))
                           (t (add-clause (cons tag rest)))))))
           (clauses config-file)
-          (hash-table-alist h))))))
+          (values (hash-table-alist h) config-file))))))
 
 (defun find-up (name)
   (labels ((root-p (dir)

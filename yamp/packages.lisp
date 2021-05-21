@@ -13,6 +13,9 @@
 
    ;; Markup
    :markup
+   :config
+   :rewriter
+   :*input-file*
 
    ;; API
    :defparser
