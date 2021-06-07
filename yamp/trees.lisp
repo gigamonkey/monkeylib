@@ -16,8 +16,8 @@
   "Extract all the elements with a given TAG in depth-first order."
   (when (consp sexp)
     (if (eql (car sexp) tag)
-        (list sexp)
-        (mapcan #'(lambda (x) (extract tag x)) sexp))))
+      (list sexp)
+      (mapcan #'(lambda (x) (extract tag x)) sexp))))
 
 (defun has (tag sexp)
   "Are there any TAG elements in SEXP?"
@@ -31,34 +31,34 @@
 replaces them with the result of FN."
   (labels ((walk (tree)
              (if (consp tree)
-                 (mapcar #'walk (if (eql (car tree) tag) (funcall fn tree) tree))
-                 tree)))
+               (mapcar #'walk (if (eql (car tree) tag) (funcall fn tree) tree))
+               tree)))
     #'walk))
 
 (defun rewriter-if (p fn)
   (labels ((walk (tree)
              (if (consp tree)
-                 (mapcar #'walk (if (funcall p tree) (funcall fn tree) tree))
-                 tree)))
+               (mapcar #'walk (if (funcall p tree) (funcall fn tree) tree))
+               tree)))
     #'walk))
 
 (defun retagger (old new)
   "Retag all trees tagged with OLD with NEW"
   (labels ((walk (tree)
              (if (consp tree)
-                 (if (eql (car tree) old)
-                     `(,new ,@(mapcar #'walk (cdr tree)))
-                     (mapcar #'walk tree))
-                 tree)))
+               (if (eql (car tree) old)
+                 `(,new ,@(mapcar #'walk (cdr tree)))
+                 (mapcar #'walk tree))
+               tree)))
     #'walk))
 
 (defun deleter (tag)
   "A function that deletes all subtrees tagged with TAG."
   (labels ((walk (tree)
              (if (consp tree)
-                 (unless (eql (car tree) tag)
-                   (list (mapcan #'walk tree)))
-                 (list tree))))
+               (unless (eql (car tree) tag)
+                 (list (mapcan #'walk tree)))
+               (list tree))))
     (compose #'car #'walk)))
 
 (defun appending (contents)
