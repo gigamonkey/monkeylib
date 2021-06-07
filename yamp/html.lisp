@@ -11,8 +11,8 @@
 (defun generate-html (file)
   "Generate HTML for the markup file in the same location except with an .html
 extension."
-   (let ((*default-pathname-defaults* (parent-directory file))
-         (*input-file* file))
+  (let ((*default-pathname-defaults* (parent-directory file))
+        (*input-file* file))
     (multiple-value-bind (output-file config) (html-filename file)
       (when output-file
         (with-output-to-file (out (ensure-directories-exist output-file))
@@ -37,10 +37,9 @@ the corresponding config file."
     (if (eql style :directory) #'html-filename/directory #'html-filename/file)))
 
 (defun html-filename/file (file config enough)
-  "Translate filename of Markup file to the HTML file to be generated and load
-the corresponding config file."
+  "Derive HTML name directly from file name."
   (let ((name (pathname-name file))
-        (dirs `(:relative ,@(config :directory config) ,@enough)))
+        (dirs `(,@(pathname-directory (first (config :directory config))) ,@enough)))
     (make-pathname
      :name (if (string= name (first (last dirs))) "index" name)
      :type "html"
@@ -81,8 +80,9 @@ the corresponding config file."
           ;; Finally, turn into Monkeylib HTML
           (htmlizer config)
 
+          ;; And some final tweaks.
           #'(lambda (d)
-              (if (eql (config :title config) :auto) (entitle d) d))
+              (if (eql (first (config :title config)) :auto) (entitle d) d))
 
           (twitter-widget has-tweets))
          doc)))))
@@ -127,17 +127,19 @@ the corresponding config file."
       (let ((h (make-hash-table)))
         (labels ((add-clause (clause)
                    (if (gethash (first clause) h)
-                       (appendf (gethash (first clause) h) (rest clause))
-                       (setf (gethash (first clause) h) (rest clause))))
+                     (appendf (gethash (first clause) h) (rest clause))
+                     (setf (gethash (first clause) h) (rest clause))))
                  (clauses (file)
                    (loop for (tag . rest) in (file->list file) do
-                        (cond
-                          ((eql tag :include)
-                           (clauses (merge-pathnames (first rest) file)))
-                          ((stringp tag)
-                           (when (string= tag (pathname-name filename))
-                             (dolist (clause rest) (add-clause clause))))
-                          (t (add-clause (cons tag rest)))))))
+                     (cond
+                       ((eql tag :include)
+                        (clauses (merge-pathnames (first rest) file)))
+                       ((eql tag :tweets)
+                        (add-clause (cons tag (list (merge-pathnames (first rest) (parent-directory file))))))
+                       ((stringp tag)
+                        (when (string= tag (pathname-name filename))
+                          (dolist (clause rest) (add-clause clause))))
+                       (t (add-clause (cons tag rest)))))))
           (clauses config-file)
           (values (hash-table-alist h) config-file))))))
 
@@ -168,9 +170,9 @@ appropriate link."
 (defun get-linkdefs (doc)
   "Extract the link names and urls."
   (loop with h = (make-hash-table :test 'equalp)
-     for (nil (nil link) (nil url)) in (extract :link_def doc)
-     do (setf (gethash link h) url)
-     finally (return h)))
+        for (nil (nil link) (nil url)) in (extract :link_def doc)
+        do (setf (gethash link h) url)
+        finally (return h)))
 
 (defun linker (links)
   "Rewrite a link tag into anchor."
@@ -183,7 +185,7 @@ appropriate link."
 (defun link-key (link)
   "The key extracted from a :link, either the explicit :key value or
 the text of the :link stripped of any markup."
-  (just-text (or (extract :key link) link)))
+  (just-text (or (first (extract :key link)) link)))
 
 (defun link-contents (link)
   "Contents of the link with any :key removed."
@@ -196,15 +198,15 @@ the text of the :link stripped of any markup."
   (declare (ignore config))
   "Rewrite a doc with :note elements converted to endnotes."
   (if (has :note doc)
-      (funcall
-       (>>>
-        (rewriter :note (numberer))
-        #'(lambda (x) `(,@x (:notes ,@(extract :note x))))
-        (rewriter :notes (rewriter :note (>>> #'endnote-backlinker #'divver)))
-        (rewriter :notes #'divver)
-        (rewriter :body (rewriter :note #'endnote-marker)))
-       doc)
-      doc))
+    (funcall
+     (>>>
+      (rewriter :note (numberer))
+      #'(lambda (x) `(,@x (:notes ,@(extract :note x))))
+      (rewriter :notes (rewriter :note (>>> #'endnote-backlinker #'divver)))
+      (rewriter :notes #'divver)
+      (rewriter :body (rewriter :note #'endnote-marker)))
+     doc)
+    doc))
 
 (defun endnote-backlinker (note)
   "Convert the number in a :NOTE element into the target for the endnote marker
@@ -257,37 +259,37 @@ ID to allow linking back."
 (defun htmlizer (config)
   (let ((name (first (config :htmlizer config))))
     (if name
-        #'(lambda (doc) (funcall (symbol-function name) doc config))
-        #'htmlize)))
+      #'(lambda (doc) (funcall (symbol-function name) doc config))
+      #'htmlize)))
 
 (defun htmlize (doc)
   "Default htmlizer used when one isn't specified in the config file. Wrap
 the :body we get from the markup parser in a proper HTML5 document with a
 doctype and proper charset."
   `(:progn
-    (:noescape "<!DOCTYPE html>")
-    (:html
-      (:head
-       (:meta :charset "UTF-8"))
-      (:body ((:div :id "container") ,@(rest doc))))))
+     (:noescape "<!DOCTYPE html>")
+     (:html
+       (:head
+        (:meta :charset "UTF-8"))
+       (:body ((:div :id "container") ,@(rest doc))))))
 
 (defun entitle (doc)
   "Add a :TITLE element to :HEAD based on the contents of the first :H1"
-  (let ((h1 (first (extract :h1 doc))))
-    (if h1
-        (funcall (rewriter :head (appending `((:title ,(just-text (cdr h1)))))) doc)
-        doc)))
+  (let ((title-h1 (first (extract :h1 doc))))
+    (if title-h1
+      (funcall (rewriter :head (appending `((:title ,(just-text title-h1))))) doc)
+      doc)))
 
 (defun twitter-widget (has-tweets)
   (if has-tweets
-      (rewriter :body
-                (appending
-                 `((:script
-                    :async "async"
-                    :src "https://platform.twitter.com/widgets.js"
-                    :type "text/javascript"
-                    :charset "utf-8"))))
-      #'identity))
+    (rewriter :body
+              (appending
+               `((:script
+                  :async "async"
+                  :src "https://platform.twitter.com/widgets.js"
+                  :type "text/javascript"
+                  :charset "utf-8"))))
+    #'identity))
 
 (defun just-text (sexp)
   "Textual content of the element as a single string with all markup
@@ -302,8 +304,8 @@ removed."
 ;; Used in config files
 (defun formatted-code (expr config)
   (declare (ignore config))
-  (destructuring-bind (pre text) expr
-    (declare (ignore pre))
+  (destructuring-bind (tag (pre text)) expr
+    (declare (ignore tag pre))
     `(:pre ,@(nth-value 1 (markup-lite (cons text 0))))))
 
 ;; Used in config files
@@ -327,14 +329,14 @@ removed."
          (contents (file-text file))
          (lines (split-sequence #\Newline contents)))
     (if (not name)
-        `(:pre (:code ,(format nil "~{~a~%~}" (remove-if #'(lambda (line) (search "8<---" line)) lines))))
-        (flet ((start (line) (search (format nil "8<--- ~a" name) line))
-               (end (line) (search "8<----" line)))
-          (let* ((start (cdr (member-if #'start lines)))
-                 (end (member-if #'end start)))
-            (if end
-                `(:pre (:code ,(format nil "~{~&~a~}" (ldiff start end))))
-                (error "Coludn't find include section ~a in ~a" name file)))))))
+      `(:pre (:code ,(format nil "~{~a~%~}" (remove-if #'(lambda (line) (search "8<---" line)) lines))))
+      (flet ((start (line) (search (format nil "8<--- ~a" name) line))
+             (end (line) (search "8<----" line)))
+        (let* ((start (cdr (member-if #'start lines)))
+               (end (member-if #'end start)))
+          (if end
+            `(:pre (:code ,(format nil "~{~&~a~}" (ldiff start end))))
+            (error "Coludn't find include section ~a in ~a" name file)))))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -356,7 +358,7 @@ removed."
         (:body
          ((:div :class "wrap")
           (:header
-           (:figure (:img :src "../img/monkey.jpg" (:figcaption "Original image by Luc Viatour / " ((:a :href "http://www.Lucnix.be") "www.Lucnix.be")))))
+           (:figure ((:a :href "/") (:img :src "../img/monkey.jpg" (:figcaption "Original image by Luc Viatour / " ((:a :href "http://www.Lucnix.be") "www.Lucnix.be"))))))
           ((:div :class "contents") ,@(rest doc))
           (:footer
            (:p "Copyright " ,@(config :year config) " Peter Seibel")
@@ -402,8 +404,8 @@ removed."
                      (non-paragraph-element (first tree))
                      (paragraph-element (second tree)))
                 `(,(walk (first tree))
-                   ,(walk `((:p :class "noindent") ,@(rest (second tree))))
-                   ,@(walk (rest (rest tree)))))
+                  ,(walk `((:p :class "noindent") ,@(rest (second tree))))
+                  ,@(walk (rest (rest tree)))))
                ((consp tree)
                 `(,(walk (first tree)) ,@(walk (rest tree))))
                (t tree))))
@@ -419,12 +421,12 @@ removed."
             (:? "xml" :version 1.0 :encoding "utf-8")
             (:noescape "<!DOCTYPE html>")
             ((:html :xmlns "http://www.w3.org/1999/xhtml"
-                    :xmlns\:epub "http://www.idpf.org/2007/ops")
+               :xmlns\:epub "http://www.idpf.org/2007/ops")
              (:body
               ((:nav :epub\:type "toc")
                (:ol
                 ,@(loop for i from 1 for c in chapters collecting
-                       `(:li (:a :href ,(format nil "grid.html#chapter_~d" i) ,(just-text c))))))
+                        `(:li (:a :href ,(format nil "grid.html#chapter_~d" i) ,(just-text c))))))
               ((:nav :epub\:type "landmarks" :class "hidden-tag" :hidden "hidden")
                ((:ol :class "none" :epub\:type "list")
                 (:li (:a :epub\:type "toc" :href "toc.html" "Table of Contents"))))))))))))
