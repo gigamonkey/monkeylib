@@ -27,7 +27,7 @@ extension."
 the corresponding config file."
   (multiple-value-bind (config config-file) (load-config file)
     (when config
-      (let* ((root (parent-directory config-file))
+      (let* ((root (or (first (config :root config)) (parent-directory config-file)))
              (enough (rest (pathname-directory (enough-namestring file root))))
              (html-file (funcall (filename-function config) file config enough)))
         (values (merge-pathnames html-file root) config)))))
@@ -91,7 +91,7 @@ the corresponding config file."
   (parse-iso-8601
    (or
     (second (first (extract :dateline doc)))
-    (second (config :dateline config))
+    (first (config :dateline config))
     (format-iso-8601-time (now) :omit-time t))))
 
 (defun spans-rewriter (config)
@@ -136,6 +136,8 @@ the corresponding config file."
                         (clauses (merge-pathnames (first rest) file)))
                        ((eql tag :tweets)
                         (add-clause (cons tag (list (merge-pathnames (first rest) (parent-directory file))))))
+                       ((eql tag :root)
+                        (add-clause (cons tag (list (truename (merge-pathnames (first rest) (parent-directory file)))))))
                        ((stringp tag)
                         (when (string= tag (pathname-name filename))
                           (dolist (clause rest) (add-clause clause))))

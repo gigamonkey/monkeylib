@@ -31,7 +31,17 @@
 replaces them with the result of FN."
   (labels ((walk (tree)
              (if (consp tree)
-               (mapcar #'walk (if (eql (car tree) tag) (funcall fn tree) tree))
+               (if (eql (car tree) tag)
+                 (let ((new (funcall fn tree)))
+                   (if (consp new)
+                     ;; Don't rewrite the rewritten tree as rewriters that don't
+                     ;; change the tree's tag will loop forever.
+                     `(,(first new) ,@(mapcar #'walk (rest new)))
+                     new))
+                 ;; Tag doesn't match, rewrite the children.
+                 (mapcar #'walk tree))
+
+               ;; Not a tree. Just return.
                tree)))
     #'walk))
 

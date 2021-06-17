@@ -15,6 +15,8 @@
    :markup
    :config
    :rewriter
+   :extract
+   :just-text
    :*input-file*
 
    ;; API
@@ -43,7 +45,18 @@
    :&state
    :_
    :->
-   :=>)
+   :=>
+
+   ;; Pre-processors and section handlers
+   :links
+   :endnotes
+   :images
+
+   :sourcecode
+   :format-dateline
+   :tweet-by-id
+   :formatted-code)
+
   (:import-from :alexandria :with-gensyms)
   (:import-from :monkeylib-text-output :with-text-output)
   (:shadow :!))
