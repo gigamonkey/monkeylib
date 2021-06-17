@@ -129,10 +129,11 @@
 
 (defparser json-parser (^ value))
 
-(defun parse-json (text)
+(defun parse-json (text &key (result :hash-table))
   "Parse json text into Lisp objects. Hash tables are used to
 represent Javascript objects and vectors to represent arrays."
-  (fix-empty-object (nth-value 1 (json-parser text))))
+  (let ((*object-type* result))
+    (fix-empty-object (nth-value 1 (json-parser text)))))
 
 (defun fix-empty-object (json)
   (cond

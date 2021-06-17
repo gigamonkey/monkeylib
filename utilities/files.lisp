@@ -48,13 +48,15 @@
     (with-open-file (in filename)
       (read in nil nil))))
 
-(defmacro with-output-to-file ((out file &key (ensure-directories nil)) &body body)
+(defmacro with-output-to-file ((out file &key (ensure-directories nil) (binary nil)) &body body)
   "Write to a file, creating if it does not exist and superseding if
 it does. Returns the truename of the file created.
 If :ensure-directories is true, create parent directories too."
   (once-only (file)
     `(with-open-file (,out (if ,ensure-directories (ensure-directories-exist ,file) ,file)
-                           :direction :output :if-exists :supersede)
+                           :direction :output
+                           :if-exists :supersede
+                           :element-type (if ,binary '(unsigned-byte 8) 'character))
        ,@body
        (truename ,out))))
 

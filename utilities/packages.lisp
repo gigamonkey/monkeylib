@@ -5,7 +5,7 @@
 (in-package :cl-user)
 
 (defpackage :monkeylib-utilities
-  (:use :cl :split-sequence :alexandria)
+  (:use :cl :split-sequence :alexandria :cl-ppcre)
   ;; These are also defined in alexandria. At some point should use
   ;; theirs but they aren't exactly the same so that requires finding
   ;; all the places I use them.
@@ -94,7 +94,8 @@
    :parse-time
    :round-to
    :round-to-unit-fraction
-   :keywordize)
+   :keywordize
+   :camel-to-kebab)
 
   ;; Re-export inherited symbols -- too lazy to type them all.
   (:export . #.(loop for sym being the external-symbols of :split-sequence collect sym))
