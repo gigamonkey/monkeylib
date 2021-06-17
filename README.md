@@ -42,3 +42,5 @@ This repo was created by combining these repos.
 - https://github.com/gigamonkey/monkeylib-text-output
 
 - https://github.com/gigamonkey/monkeylib-utilities
+
+- https://github.com/gigamonkey/yamp
