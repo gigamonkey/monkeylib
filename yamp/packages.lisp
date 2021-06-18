@@ -17,6 +17,7 @@
    :rewriter
    :extract
    :before
+   :has
    :after
    :just-text
    :*input-file*
