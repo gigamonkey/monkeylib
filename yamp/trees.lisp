@@ -19,6 +19,24 @@
       (list sexp)
       (mapcan #'(lambda (x) (extract tag x)) sexp))))
 
+(defun before (tag new sexp)
+  (labels ((walk (tree)
+             (if (consp tree)
+               (if (eql (car tree) tag)
+                 (list new tree)
+                 (list (mapcan #'walk tree)))
+               (list tree))))
+    (first (walk sexp))))
+
+(defun after (tag new sexp)
+  (labels ((walk (tree)
+             (if (consp tree)
+               (if (eql (car tree) tag)
+                 (list tree new)
+                 (list (mapcan #'walk tree)))
+               (list tree))))
+    (first (walk sexp))))
+
 (defun has (tag sexp)
   "Are there any TAG elements in SEXP?"
   (when (consp sexp)

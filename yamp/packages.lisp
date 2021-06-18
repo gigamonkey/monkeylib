@@ -16,6 +16,8 @@
    :config
    :rewriter
    :extract
+   :before
+   :after
    :just-text
    :*input-file*
 
