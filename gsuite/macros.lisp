@@ -15,7 +15,7 @@
          (let ((,data ()))
            ,@(loop for prop in properties
                    for (arg nil arg-p) in prop-args
-                   collect `(when ,arg
-                            (push ,arg ,data)
-                            (push ,prop ,data)))
+                   collect `(when (and ,arg-p (not (eql ,arg :null)))
+                              (push ,arg ,data)
+                              (push ,prop ,data)))
            ,data)))))
