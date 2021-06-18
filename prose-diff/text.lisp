@@ -19,7 +19,7 @@
        (setf
         (gethash key *interned-text*)
         (make-instance 'propertied-text
-          :text text 
+          :text text
           :properties properties))))))
 
 (defun add-property (text new-prop)
@@ -54,7 +54,7 @@ textify-markup into a list of Markup sexps."
   (destructuring-bind (tag &rest body) markup
     (let ((props (cons tag properties))
           (results ()))
-      (loop for element in body do 
+      (loop for element in body do
            (loop for x in (%textify-markup element props) do (push x results)))
       ;;; This next line is a bit of a kludge to keep adjacent
       ;;; elements with the same tag, e.g. adjacent :P's, from
@@ -104,9 +104,9 @@ text split into words, whitespace, and punctuation or just the words."
   (equal (last text-props (length open-props)) open-props))
 
 (defun unopen (text-props open-props)
-  (multiple-value-bind (unopen open) 
+  (multiple-value-bind (unopen open)
       (take text-props (- (length text-props) (length open-props)))
-    (assert (equal open-props open) () 
+    (assert (equal open-props open) ()
             "Remaining props ~s not equal to open props ~s" open open-props)
     unopen))
 
@@ -134,6 +134,6 @@ containing the diff as propertied-text."
                           (prog1 just-saw-space (setf just-saw-space t))
                           (setf just-saw-space nil))))
                (remove-if #'collapsable? lcs)))))
-    
-    (let ((diff (diff-vectors a b #'collapse-spaces-in-lcs)))
+
+    (let ((diff (diff-vectors a b :lcs-frobber #'collapse-spaces-in-lcs)))
       (map-into diff #'translate-textified diff))))
