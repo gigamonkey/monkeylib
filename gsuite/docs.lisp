@@ -1,10 +1,18 @@
 (in-package :monkeylib-gsuite)
 
+(defparameter *auth-token-file* #.(merge-pathnames "token.txt" (or *load-truename* *compile-file-truename*)))
+
 (defvar *auth-token*)
 
-(defparameter *docs-base-url* "https://docs.googleapis.com/")
+(defparameter *doc-id* "15SIOd6AJYbTTSuzB6ogD06H9SLrnqesF4nJ-0weemi0")
+
+(defparameter *docs-base-url* "https://docs.googleapis.com")
+
+(defparameter *drive-base-url* "https://www.googleapis.com/drive/v3")
 
 (defparameter *docs-discovery* "https://docs.googleapis.com/$discovery/rest?version=v1")
+
+(defparameter *drive-discovery* "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest")
 
 (defparameter *discovery-discovery* "https://discovery.googleapis.com/discovery/v1/apis")
 
@@ -31,13 +39,16 @@
 ;;; HTTP foo
 
 (defun reload-auth-token ()
-  (setq *auth-token* (auth-token)))
+  (setq *auth-token* (string-trim '(#\Newline) (file-text *auth-token-file*))))
 
-(defun auth-token ()
-  "Fetch the auth token we've stashed in a local file."
-  (string-trim '(#\Newline) (file-text "/Users/peter/hacks/monkeylib/gsuite/token.txt")))
+(defun http-get (url params)
+  (http-request
+   url
+   :method :get
+   :parameters params
+   :additional-headers (list (cons "Authorization" (format nil "Bearer ~a" *auth-token*)))))
 
-(defun post (url content)
+(defun http-post (url content)
   (http-request
    url
    :method :post
@@ -45,18 +56,40 @@
    :content (flexi-streams:string-to-octets  (json content) :external-format :utf-8)
    :additional-headers (list (cons "Authorization" (format nil "Bearer ~a" *auth-token*)))))
 
-(defun create-document (title)
+
+;;; REST methods
+
+
+(defun document-create (title)
   (let ((url (format nil "~a/v1/documents" *docs-base-url*)))
     (gethash
      "documentId"
-     (monkeylib-json-parser:parse-json (post url (document :title title))))))
+     (monkeylib-json-parser:parse-json (http-post url (document :title title))))))
 
-(defun batch-update-request (document-id requests)
+(defun document-batch-update (document-id requests)
   (let ((url (format nil "~a/v1/documents/~a:batchUpdate" *docs-base-url* document-id)))
-    (post url (batch-update-document-request :requests requests))))
+    (http-post url (batch-update-document-request :requests requests))))
 
-(defun append-to-doc (text document-id)
-  (batch-update-request
+(defun document-get (document-id &key suggestions-view-mode)
+  (let ((url (format nil "~a/v1/documents/~a" *docs-base-url* document-id))
+        (params ()))
+    (when suggestions-view-mode (push (cons "suggestionsViewMode" suggestions-view-mode) params))
+    (http-get url params)))
+
+(defun drive-comments-list (file-id &key include-deleted page-size page-token start-modified-time)
+  (let ((url (format nil "~a/files/~a/comments" *drive-base-url* file-id))
+        (params (list (cons "fields" "*"))))
+    (when include-deleted (push (cons "includeDeleted" "true") params))
+    (when page-size (push (cons "pageSize" page-size) params))
+    (when page-token (push (cons "pageToken" page-token) params))
+    (when start-modified-time (push (cons "startModifiedTime" start-modified-time) params))
+    (http-get url params)))
+
+
+;;; API
+
+(defun append-to-doc (document-id text)
+  (document-batch-update
    document-id
    (vector
     (request :insert-text
@@ -76,33 +109,5 @@
             :range (range :start-index start :end-index end)
             :paragraph-style style)))
 
-
-(defun markup-styles (ranges)
-  (let ((updates ()))
-    (labels ((walk (x)
-               (when (consp x)
-                 (destructuring-bind ((tag start end) . rest) x
-                   (flet ((add-text-style (&rest keys &key &allow-other-keys)
-                            (push (make-update-text-style-request (1+ start) (1+ end) (apply #'text-style keys)) updates))
-                          (add-paragraph-style (&rest keys &key &allow-other-keys)
-                            (push (make-update-paragraph-style-request (1+ start) (1+ end) (apply #'paragraph-style keys)) updates)))
-                     (case tag
-                       (:h1
-                        (add-text-style :bold t :font-size (dimension :magnitude 24 :unit "PT"))
-                        (add-paragraph-style  :named-style-type "TITLE"))
-                       (:preface
-                        (add-text-style :italic t :font-size (dimension :magnitude 10 :unit "PT")))
-                       (:§
-                        (add-paragraph-style :alignment "CENTER"))
-                       (:i
-                        (add-text-style :italic t)))
-                     (dolist (x rest)
-                       (walk x)))))))
-      (walk ranges)
-      (coerce (nreverse updates) 'vector))))
-
-(defun to-google-doc (markup document-id)
-  (let ((text (wlal:text-of markup))
-        (ranges (wlal:text-ranges markup)))
-    (append-to-doc text document-id)
-    (batch-update-request document-id (markup-styles ranges))))
+(defun grey (amt)
+  (color :rgb-color (rgb-color :blue amt :green amt :red amt)))

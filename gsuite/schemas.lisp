@@ -148,7 +148,7 @@
 
 (defschema linked-content-reference-suggestion-state "sheetsChartReferenceSuggestionState")
 
-(defschema list "suggestedInsertionId" "suggestedListPropertiesChanges" "suggestedDeletionIds" "listProperties")
+(defschema %list "suggestedInsertionId" "suggestedListPropertiesChanges" "suggestedDeletionIds" "listProperties")
 
 (defschema list-properties "nestingLevels")
 
