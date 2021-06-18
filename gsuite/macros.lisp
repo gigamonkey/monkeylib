@@ -14,8 +14,8 @@
       `(defun ,name (&key ,@prop-args)
          (let ((,data ()))
            ,@(loop for prop in properties
-                 for (arg nil arg-p) in prop-args
-                 collect `(when ,arg-p
+                   for (arg nil arg-p) in prop-args
+                   collect `(when ,arg
                             (push ,arg ,data)
                             (push ,prop ,data)))
            ,data)))))

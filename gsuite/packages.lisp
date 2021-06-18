@@ -12,7 +12,9 @@
    :document-get
    :document-batch-update
    :append-to-doc
+   :append-to-segment
 
+   :make-create-footnote-request
    :make-update-text-style-request
    :make-update-paragraph-style-request
    :grey

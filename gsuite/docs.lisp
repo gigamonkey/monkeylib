@@ -49,12 +49,16 @@
    :additional-headers (list (cons "Authorization" (format nil "Bearer ~a" *auth-token*)))))
 
 (defun http-post (url content)
-  (http-request
-   url
-   :method :post
-   :content-type "application/json; charset=UTF-8"
-   :content (flexi-streams:string-to-octets  (json content) :external-format :utf-8)
-   :additional-headers (list (cons "Authorization" (format nil "Bearer ~a" *auth-token*)))))
+  (multiple-value-bind (resp status)
+      (http-request
+       url
+       :method :post
+       :content-type "application/json; charset=UTF-8"
+       :content (flexi-streams:string-to-octets  (json content) :external-format :utf-8)
+       :additional-headers (list (cons "Authorization" (format nil "Bearer ~a" *auth-token*))))
+    (cond
+      ((= status 200) resp)
+      (t (error "~d: resp: ~a" status resp)))))
 
 
 ;;; REST methods
@@ -64,11 +68,11 @@
   (let ((url (format nil "~a/v1/documents" *docs-base-url*)))
     (gethash
      "documentId"
-     (monkeylib-json-parser:parse-json (http-post url (document :title title))))))
+     (parse-json (http-post url (document :title title))))))
 
 (defun document-batch-update (document-id requests)
   (let ((url (format nil "~a/v1/documents/~a:batchUpdate" *docs-base-url* document-id)))
-    (http-post url (batch-update-document-request :requests requests))))
+    (parse-json (http-post url (batch-update-document-request :requests requests)))))
 
 (defun document-get (document-id &key suggestions-view-mode)
   (let ((url (format nil "~a/v1/documents/~a" *docs-base-url* document-id))
@@ -89,24 +93,34 @@
 ;;; API
 
 (defun append-to-doc (document-id text)
-  (document-batch-update
-   document-id
-   (vector
-    (request :insert-text
-             (insert-text-request :text text :end-of-segment-location (end-of-segment-location))))))
+  (document-batch-update document-id (vector (make-insert-text-request text))))
 
-(defun make-update-text-style-request (start end style)
+(defun append-to-segment (document-id text segment-id)
+  (document-batch-update document-id (vector (make-insert-text-request text :segment-id segment-id))))
+
+(defun make-create-footnote-request (index)
+  (request :create-footnote
+           (create-footnote-request
+            :location (location :index index))))
+
+(defun make-insert-text-request (text &key (segment-id :null))
+  (request :insert-text
+           (insert-text-request
+            :text text
+            :end-of-segment-location (end-of-segment-location :segment-id segment-id))))
+
+(defun make-update-text-style-request (start end style &key (segment-id :null))
   (request :update-text-style
            (update-text-style-request
             :fields (format nil "~{~a~^,~}" (loop for x in style by #'cddr collecting x))
-            :range (range :start-index start :end-index end)
+            :range (range :start-index start :end-index end :segment-id segment-id)
             :text-style style)))
 
-(defun make-update-paragraph-style-request (start end style)
+(defun make-update-paragraph-style-request (start end style &key (segment-id :null))
   (request :update-paragraph-style
            (update-paragraph-style-request
             :fields (format nil "~{~a~^,~}" (loop for x in style by #'cddr collecting x))
-            :range (range :start-index start :end-index end)
+            :range (range :start-index start :end-index end :segment-id segment-id)
             :paragraph-style style)))
 
 (defun grey (amt)
