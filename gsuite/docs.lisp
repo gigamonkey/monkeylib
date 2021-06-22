@@ -1,8 +1,6 @@
 (in-package :monkeylib-gsuite)
 
-(defparameter *auth-token-file* #.(merge-pathnames "token.txt" (or *load-truename* *compile-file-truename*)))
-
-(defvar *auth-token*)
+(defparameter *auth-token-file* "token.sexp")
 
 (defparameter *doc-id* "15SIOd6AJYbTTSuzB6ogD06H9SLrnqesF4nJ-0weemi0")
 
@@ -38,27 +36,73 @@
 
 ;;; HTTP foo
 
-(defun reload-auth-token ()
-  (setq *auth-token* (string-trim '(#\Newline) (file-text *auth-token-file*))))
-
 (defun http-get (url params)
   (http-request
    url
    :method :get
    :parameters params
-   :additional-headers (list (cons "Authorization" (format nil "Bearer ~a" *auth-token*)))))
+   :additional-headers (list (cons "Authorization" (format nil "Bearer ~a" (auth-token))))))
 
-(defun http-post (url content)
+
+(defun http-post (url &key (content nil content-supplied-p) (parameters nil parameters-supplied-p))
   (multiple-value-bind (resp status)
-      (http-request
-       url
-       :method :post
-       :content-type "application/json; charset=UTF-8"
-       :content (flexi-streams:string-to-octets  (json content) :external-format :utf-8)
-       :additional-headers (list (cons "Authorization" (format nil "Bearer ~a" *auth-token*))))
+      (cond
+        (content-supplied-p
+         (http-request
+          url
+          :method :post
+          :content-type "application/json; charset=UTF-8"
+          :content (flexi-streams:string-to-octets  (json content) :external-format :utf-8)
+          :additional-headers (list (cons "Authorization" (format nil "Bearer ~a" (auth-token))))))
+        (parameters-supplied-p
+         (http-request
+          url
+          :method :post
+          :parameters parameters
+          :additional-headers (list (cons "Authorization" (format nil "Bearer ~a" *auth-token*)))))
+        (t (error "Must supply either :content or :parameters")))
     (cond
       ((= status 200) resp)
       (t (error "~d: resp: ~a" status resp)))))
+
+
+;;; Authentication
+
+(defun auth-token (&optional (token-file *auth-token-file*))
+  "Load the auth token, refreshing if needed."
+  (getf (maybe-refresh-token token-file) :token))
+
+(defun save-token (token-file &key token expires refresh-token token-uri client-id client-secret)
+  (with-data-to-file (out token-file)
+    (prin1
+     (list :token token
+           :expires expires
+           :refresh-token refresh-token
+           :token-uri token-uri
+           :client-id client-id
+           :client-secret client-secret)
+     out)))
+
+(defun maybe-refresh-token (token-file)
+  (let ((data (file->sexp token-file)))
+    (when (< (getf data :expires) (1+ (get-universal-time)))
+      (let ((refreshed (apply #'refresh-token data)))
+        (setf
+         (getf data :token) (gethash "access_token" refreshed)
+         (getf data :expires) (+ (get-universal-time) (gethash "expires_in" refreshed)))
+        (apply #'save-token token-file data)))
+    data))
+
+(defun refresh-token (&key refresh-token client-id client-secret token-uri &allow-other-keys)
+  "Refresh an expired token with the refresh token."
+   (parse-json
+    (http-post
+     token-uri
+     :parameters
+     `(("client_id" . ,client-id)
+       ("client_secret" . ,client-secret)
+       ("refresh_token" . ,refresh-token)
+       ("grant_type" . "refresh_token")))))
 
 
 ;;; REST methods
@@ -68,11 +112,11 @@
   (let ((url (format nil "~a/v1/documents" *docs-base-url*)))
     (gethash
      "documentId"
-     (parse-json (http-post url (document :title title))))))
+     (parse-json (http-post url :content (document :title title))))))
 
 (defun document-batch-update (document-id requests)
   (let ((url (format nil "~a/v1/documents/~a:batchUpdate" *docs-base-url* document-id)))
-    (parse-json (http-post url (batch-update-document-request :requests requests)))))
+    (parse-json (http-post url :content (batch-update-document-request :requests requests)))))
 
 (defun document-get (document-id &key suggestions-view-mode)
   (let ((url (format nil "~a/v1/documents/~a" *docs-base-url* document-id))
