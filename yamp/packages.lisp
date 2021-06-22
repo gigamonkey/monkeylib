@@ -12,9 +12,11 @@
   (:export
 
    ;; Markup
+   :>>>
    :markup
    :config
    :rewriter
+   :deleter
    :extract
    :before
    :has
