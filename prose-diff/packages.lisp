@@ -13,4 +13,11 @@
         :monkeylib-markup-html)
   (:import-from :alexandria :compose)
   (:export
-   :show-cuts))
+   :show-cuts
+   :lcs
+   :lcs-length
+   :lcs-positions
+   :lcs-table
+   :show-lcs-table
+   :similarity
+   :one-way-similarity))
