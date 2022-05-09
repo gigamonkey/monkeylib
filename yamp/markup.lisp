@@ -116,7 +116,7 @@ variable."
    whitespace)
 
   (paragraph-text
-   (=> (many1 (or (text-until (or tag-open "[" blank)) tagged-text linkref)))
+   (=> (many1 (or (text-until (or tag-open "[" "`" blank)) tagged-text backtick-text linkref)))
    blank)
 
   (linkref
@@ -129,7 +129,7 @@ variable."
 
   (link-key "|" (text-until "]"))
 
-  (escaped-char (and "\\" (or #\\ #\{ #\} #\* #\# #\- #\[ #\] #\% #\| #\<)))
+  (escaped-char (and "\\" (or #\\ #\{ #\} #\* #\# #\- #\[ #\] #\% #\| #\< #\`)))
 
   ((unescaped p) (! escaped-char) (match p))
 
@@ -150,6 +150,9 @@ variable."
    (-> tag-open tag)
    (=> (if (member tag subdocs) subdoc-contents simple-contents) `(,tag ,@_))
    "}")
+
+  (backtick-text
+   (unescaped "`") (=> (text (many (not-char #\`))) `(:code ,_)) "`")
 
   (subdoc-contents
    (incf subdoc-level)
