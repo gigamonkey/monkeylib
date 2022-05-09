@@ -113,8 +113,16 @@ the corresponding config file."
                  (if (eql (car (second tree)) tag) (funcall fn (second tree) config) tree))))
     #'(lambda (doc)
         (funcall
-         (rewriter :section #'(lambda (s) (divver (second s))))
+         (rewriter :section #'maybe-divver)
          (reduce #'apply-section (config :sections config) :initial-value doc)))))
+
+(defun maybe-divver (section)
+  ;; FIXME: should be using functions to take appart these trees. Not sure if
+  ;; they exist or if I need to write them.
+  (let ((tag (first (second section))))
+    (if (eql tag :progn)
+      (second section)
+      (divver (second section)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Configuration
@@ -197,32 +205,49 @@ the text of the :link stripped of any markup."
 ;; Endnote rewriting
 
 (defun endnotes (doc config)
-  (declare (ignore config))
   "Rewrite a doc with :note elements converted to endnotes."
-  (if (has :note doc)
-    (funcall
-     (>>>
-      (rewriter :note (numberer))
-      #'(lambda (x) `(,@x (:notes ,@(extract :note x))))
-      (rewriter :notes (rewriter :note (>>> #'endnote-backlinker #'divver)))
-      (rewriter :notes #'divver)
-      (rewriter :body (rewriter :note #'endnote-marker)))
-     doc)
-    doc))
+  (let ((extra-backlink (config :footnote-backlink config)))
+    (declare (special extra-backlink))
+    (if (has :note doc)
+      (funcall
+       (>>>
+        (rewriter :note (numberer))
+        #'(lambda (x) `(,@x (:notes ,@(extract :note x))))
+        (rewriter :notes (rewriter :note (>>> #'endnote-backlinker #'divver)))
+        (rewriter :notes #'divver)
+        (rewriter :body (rewriter :note #'endnote-marker)))
+       doc)
+      doc)))
 
 (defun endnote-backlinker (note)
   "Convert the number in a :NOTE element into the target for the endnote marker
 and a link back to the marker."
+  (declare (special extra-backlink))
   (destructuring-bind (tag n (e1 &rest e1-body) &rest body) note
-    `(,tag
-      (,e1
-       ((:a
-         :id ,(note-id n)
-         :href ,(fragment (marker-id n))
-         :class "backlink")
-        ,n) " "
-       ,@e1-body)
-      ,@body)))
+    (let ((with-number-linked
+              `(,tag
+                (,e1
+                 ((:a
+                   :id ,(note-id n)
+                   :href ,(fragment (marker-id n))
+                   :class "backlink")
+                  ,n) " "
+                  ,@e1-body)
+                ,@body)))
+      (if extra-backlink
+        (add-back-button n with-number-linked)
+        with-number-linked))))
+
+(defun add-back-button (n note)
+  (declare (special extra-backlink))
+  (destructuring-bind (tag &rest paragraphs) note
+    (let* ((last (last paragraphs))
+           (front (ldiff paragraphs last))
+           (end (first last)))
+      (setf end `(,@end (:noescape "&nbsp;") ((:a :href ,(fragment (marker-id n)) :class "endnote-return") ,extra-backlink)))
+      `(,tag ,@front ,end))))
+
+
 
 (defun endnote-marker (note)
   "Make a :NOTE element into its endnote marker, linking to the note and with an
