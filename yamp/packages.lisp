@@ -16,8 +16,10 @@
    :markup
    :config
    :rewriter
+   :rewriter-if
    :deleter
    :extract
+   :without
    :before
    :has
    :after
