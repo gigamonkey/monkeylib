@@ -48,6 +48,12 @@
     (with-open-file (in filename)
       (read in nil nil))))
 
+(defun file->octets (filename)
+  (with-open-file (in filename :element-type '(unsigned-byte 8))
+    (let ((buf (make-array (file-length in) :element-type '(unsigned-byte 8))))
+      (read-sequence buf in)
+      buf)))
+
 (defmacro with-output-to-file ((out file &key (ensure-directories nil) (binary nil)) &body body)
   "Write to a file, creating if it does not exist and superseding if
 it does. Returns the truename of the file created.
