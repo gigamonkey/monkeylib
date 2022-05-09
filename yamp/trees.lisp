@@ -19,6 +19,10 @@
       (list sexp)
       (mapcan #'(lambda (x) (extract tag x)) sexp))))
 
+(defun without (tag sexp)
+  "Sexp with all TAG elements removed."
+  (funcall (deleter tag) sexp))
+
 (defun before (tag new sexp)
   (labels ((walk (tree)
              (if (consp tree)
