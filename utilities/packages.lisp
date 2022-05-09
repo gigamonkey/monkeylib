@@ -95,6 +95,7 @@
    :round-to
    :round-to-unit-fraction
    :keywordize
+   :keywordize-plist
    :camel-to-kebab)
 
   ;; Re-export inherited symbols -- too lazy to type them all.
