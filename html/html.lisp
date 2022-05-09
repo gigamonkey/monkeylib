@@ -55,6 +55,14 @@
   (when (or (paragraph-element-p tag environment) (block-element-p tag environment))
     (freshline processor)))
 
+(defmethod emit-attributes ((language html) processor attributes environment)
+  (loop for (k v) on attributes by #'cddr do
+    (raw-string processor (format nil " ~a" (funcall (name-converter language) k)))
+    (when (not (eql v k))
+      (raw-string processor "='")
+      (process language processor (if (eql v t) (funcall (name-converter language) k) v) (in-attribute environment))
+      (raw-string processor "'"))))
+
 (defmethod top-level-environment ((language html))
   (let ((bindings
          '((empty-elements
