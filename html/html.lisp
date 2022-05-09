@@ -70,7 +70,7 @@
             :param :source :track :wbr)
            (block-elements
             :body :colgroup :div :dl :fieldset :form :head :html :map :noscript
-            :object :ol :optgroup :pre :script :select :style :table :tbody
+            :object :ol :optgroup :pre :script :select :section :style :table :tbody
             :tfoot :thead :tr :ul)
            (paragraph-elements
             :area :base :blockquote :br :button :caption :col :dd :div :dt :h1
