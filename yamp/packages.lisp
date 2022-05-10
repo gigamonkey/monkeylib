@@ -66,4 +66,6 @@
 
   (:import-from :alexandria :with-gensyms)
   (:import-from :monkeylib-text-output :with-text-output)
+  (:import-from :monkeylib-html :element-p :html)
+  (:import-from :monkeylib-text-languages :special-form-p :top-level-environment)
   (:shadow :!))

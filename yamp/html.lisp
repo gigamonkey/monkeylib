@@ -117,12 +117,16 @@ the corresponding config file."
          (reduce #'apply-section (config :sections config) :initial-value doc)))))
 
 (defun maybe-divver (section)
-  ;; FIXME: should be using functions to take appart these trees. Not sure if
-  ;; they exist or if I need to write them.
-  (let ((tag (first (second section))))
-    (if (eql tag :progn)
+  (let ((child  (second section)))
+    (if (known-tag-p child)
       (second section)
-      (divver (second section)))))
+      (divver (first (second section))))))
+
+(defun known-tag-p (child)
+  (let ((html (make-instance 'html)))
+    (or (element-p (first child) (top-level-environment html))
+        (special-form-p html child))))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Configuration
