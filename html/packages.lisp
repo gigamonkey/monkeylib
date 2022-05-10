@@ -15,6 +15,7 @@
    :define-html-macro
    :define-html-special-operator
    :define-xml-language
+   :element-p
    :emit-xml
    :emit-html
    :emit-xhtml

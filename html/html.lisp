@@ -86,13 +86,20 @@
             :script :style :textarea))))
     (loop for (k . v) in (cons nil bindings)
        for env = (call-next-method) then (new-env k v env)
-       finally (return env))))
+          finally (return (new-env 'all-elements (all-elements bindings) env)))))
+
+(defun all-elements (bindings)
+  (mapcan #'(lambda (x) (copy-seq (cdr x))) bindings))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; One element of environment specific to HTML.
 
 (defun empty-element-p (tag env)
   (find tag (environment-value 'empty-elements env)))
+
+(defun element-p (tag env)
+  (find tag (environment-value 'all-elements env)))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Macros
