@@ -112,8 +112,10 @@ variable."
 
   (modeline-variable
    whitespace
-   (-> name n) ": " (=> (text (many (not-char #\;))) (cons n _)) ";"
+   (-> lisp-name n) ": " (=> (text (many (not-char #\;))) (cons n _)) ";"
    whitespace)
+
+  (lisp-name (=> (text (many1 (? any-char #'lisp-char-p))) (keywordize _)))
 
   (paragraph-text
    (=> (many1 (or (text-until (or tag-open "[" "`" blank)) tagged-text backtick-text linkref)))
@@ -193,6 +195,9 @@ variable."
 
 
 ;;; Utility functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun lisp-char-p (c)
+  (or (alphanumericp c) (char= c #\-)))
 
 (defun detab (s)
   "Convert tab characters to eight spaces."
