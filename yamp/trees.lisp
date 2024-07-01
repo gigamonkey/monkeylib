@@ -48,7 +48,7 @@
         (has tag (first sexp))
         (has tag (rest sexp)))))
 
-(defun rewriter (tag fn)
+(defun rewriter (tag fn &optional (ignore (constantly nil)))
   "A function that given a tree finds every instance of TAG'd elements and
 replaces them with the result of FN."
   (labels ((walk (tree)
@@ -60,8 +60,10 @@ replaces them with the result of FN."
                      ;; change the tree's tag will loop forever.
                      `(,(first new) ,@(mapcar #'walk (rest new)))
                      new))
-                 ;; Tag doesn't match, rewrite the children.
-                 (mapcar #'walk tree))
+                 ;; Tag doesn't match, rewrite the children unless we're ignoring it
+                 (if (not (funcall ignore (car tree)))
+                   (mapcar #'walk tree)
+                   tree))
 
                ;; Not a tree. Just return.
                tree)))

@@ -17,6 +17,7 @@
    :config
    :rewriter
    :rewriter-if
+   :replacing-with
    :deleter
    :extract
    :without
@@ -25,6 +26,12 @@
    :after
    :just-text
    :*input-file*
+
+   ;; HTML
+   :generate-html
+   :html-filename
+   :html-config
+   :generic-html
 
    ;; API
    :defparser

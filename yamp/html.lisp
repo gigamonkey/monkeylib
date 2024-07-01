@@ -8,12 +8,17 @@
 
 (defvar *input-file*)
 
+;; FIXME: this is a gross hack so I can quick-and-dirty generate certain pages
+;; with targets on all their links. Need to find a better way to express this
+;; directly in markup or at least in the markup config and thread it through to
+;; HTML generation.
+(defparameter *link-target* nil)
+
 (defun generate-html (file)
-  "Generate HTML for the markup file in the same location except with an .html
-extension."
+  "Generate HTML for the markup file. Exact location determined by configuration options."
   (let ((*default-pathname-defaults* (parent-directory file))
         (*input-file* file))
-    (multiple-value-bind (output-file config) (html-filename file)
+    (multiple-value-bind (output-file config) (html-filename-and-config file)
       (when output-file
         (with-output-to-file (out (ensure-directories-exist output-file))
           (with-text-output (out)
@@ -23,6 +28,12 @@ extension."
         (namestring (truename output-file))))))
 
 (defun html-filename (file)
+  (nth-value 0 (html-filename-and-config file)))
+
+(defun html-config (file)
+  (nth-value 1 (html-filename-and-config file)))
+
+(defun html-filename-and-config (file)
   "Translate filename of Markup file to the HTML file to be generated and load
 the corresponding config file."
   (multiple-value-bind (config config-file) (load-config file)
@@ -30,62 +41,81 @@ the corresponding config file."
       (let* ((root (or (first (config :root config)) (parent-directory config-file)))
              (enough (rest (pathname-directory (enough-namestring file root))))
              (html-file (funcall (filename-function config) file config enough)))
-        (values (merge-pathnames html-file root) config)))))
+        (values (canonize (merge-pathnames html-file root)) config)))))
 
 (defun filename-function (config)
   (let ((style (first (config :filename-style config))))
     (if (eql style :directory) #'html-filename/directory #'html-filename/file)))
 
+(defun directory-config (key config)
+  "For values that denote directories"
+  (pathname-as-directory (first (config key config))))
+
 (defun html-filename/file (file config enough)
   "Derive HTML name directly from file name."
-  (let ((name (pathname-name file))
-        (dirs `(,@(pathname-directory (first (config :directory config))) ,@enough)))
+  (let ((ext (or (first (config :filename-extension config)) "html"))
+        (name (pathname-name file))
+        (dirs `(,@(pathname-directory (directory-config :directory config)) ,@enough)))
     (make-pathname
      :name (if (string= name (first (last dirs))) "index" name)
-     :type "html"
+     :type ext
      :directory dirs
      :defaults file)))
 
 
 (defun html-filename/directory (file config enough)
-  "Translate filename of Markup file to the HTML file to be generated and load
-the corresponding config file."
-  (let* ((name (pathname-name file))
-         (dirs `(:relative ,@(config :directory config) ,@enough ,@(if (string= name "index") () `(,name)))))
+  "Derive HTML name from file name, putting each file into a directory as index.html."
+  (let* ((ext (or (first (config :filename-extension config)) "html"))
+         (name (pathname-name file))
+         (dirs `(,@(pathname-directory (directory-config :directory config))
+                 ,@enough
+                 ,@(if (string= name "index") () `(,name)))))
     (make-pathname
      :name (if (string= name (first (last dirs))) "index" name)
-     :type "html"
+     :type ext
      :directory dirs
      :defaults file)))
 
 
 (defun markup-html (doc config)
   "Transform the tree produced by the Markup parser into a Monkeylib HTML tree."
-  (let ((has-tweets (has :tweet doc)))
-    (destructuring-bind (&key year &allow-other-keys) (dateline doc config)
-      (let ((config (cons `(:year ,year) config)))
-        (funcall
-         (>>>
-          ;; Whole document rewriters.
-          (preprocessors config)
 
-          ;; Special section rewriters
-          (section-rewriters config)
+  ;; Dynamic binding of variables from config file
+  (progv (config-variable-names config) (config-variable-values config)
+    (let ((has-tweets (has :tweet doc)))
+      (destructuring-bind (&key year &allow-other-keys) (dateline doc config)
+        (let ((config (cons `(:year ,year) config)))
+          (funcall
+           (>>>
+            ;; Whole document rewriters.
+            (preprocessors config)
 
-          (rewriter :§ (replacing-with (first (config :section-marker config))))
-          (rewriter :blank (replacing-with (first (config :blank config))))
+            ;; Special section rewriters
+            (section-rewriters config)
 
-          (spans-rewriter config)
+            (rewriter :p #'deblock)
+            (rewriter :§ (replacing-with (first (config :section-marker config))))
+            (rewriter :blank (replacing-with (first (config :blank config))))
 
-          ;; Finally, turn into Monkeylib HTML
-          (htmlizer config)
+            (spans-rewriter config)
 
-          ;; And some final tweaks.
-          #'(lambda (d)
-              (if (eql (first (config :title config)) :auto) (entitle d) d))
+            ;; Finally, turn into Monkeylib HTML
+            (htmlizer config)
 
-          (twitter-widget has-tweets))
-         doc)))))
+            ;; And some final tweaks.
+            #'(lambda (d)
+                (if (eql (first (config :title config)) :auto) (entitle d) d))
+
+            (twitter-widget has-tweets))
+           doc))))))
+
+(defun config-variable-names (config)
+  (let ((bindings (config :variables config)))
+    (mapcar #'first bindings)))
+
+(defun config-variable-values (config)
+  (let ((bindings (config :variables config)))
+    (mapcar #'second bindings)))
 
 (defun dateline (doc config)
   (parse-iso-8601
@@ -117,15 +147,40 @@ the corresponding config file."
          (reduce #'apply-section (config :sections config) :initial-value doc)))))
 
 (defun maybe-divver (section)
-  (let ((child  (second section)))
+  (let ((child (second section)))
     (if (known-tag-p child)
-      (second section)
-      (divver (first (second section))))))
+      child
+      (divver (second section)))))
 
 (defun known-tag-p (child)
   (let ((html (make-instance 'html)))
     (or (element-p (first child) (top-level-environment html))
         (special-form-p html child))))
+
+
+(defun deblock (p)
+  (let ((r
+          (destructuring-bind (tag &rest body) p
+            (declare (ignore tag))
+            (if (block-element-p body)
+              (car body)
+              p))))
+    r))
+
+(defparameter *block-tags*
+  '(:address :article :aside :blockquote :canvas
+    :dd :div :dl :dt :fieldset :figcaption :figure
+    :footer :form :h1 :header :hr :li :main :nav
+    :ol :pre :section :table :tfoot :ul :video))
+
+(defun block-element-p (body)
+  #+(or)(break "Checking ~a ~a ~a ~a ~a"
+         body
+         (not (cdr body))
+         (listp (car body))
+         (and (listp (car body)) (caar body))
+         (and (listp (car body)) (eql (caar body) :table)))
+  (and (not (cdr body)) (listp (car body)) (member (caar body) *block-tags*)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -149,7 +204,8 @@ the corresponding config file."
                        ((eql tag :tweets)
                         (add-clause (cons tag (list (merge-pathnames (first rest) (parent-directory file))))))
                        ((eql tag :root)
-                        (add-clause (cons tag (list (truename (merge-pathnames (first rest) (parent-directory file)))))))
+                        ;;(break "~a ~a" (first rest) (pathname-directory (pathname (first rest))))
+                        (add-clause (cons tag (list (truename (merge-pathnames (pathname (first rest)) (parent-directory file)))))))
                        ((stringp tag)
                         (when (string= tag (pathname-name filename))
                           (dolist (clause rest) (add-clause clause))))
@@ -178,7 +234,7 @@ the corresponding config file."
 appropriate link."
   (let ((linkdefs (get-linkdefs doc)))
     (funcall
-     (>>> (deleter :link_def) (rewriter :link (linker linkdefs)))
+     (>>> (deleter :link_def) (rewriter :link (linker linkdefs *link-target*)))
      doc)))
 
 (defun get-linkdefs (doc)
@@ -188,13 +244,16 @@ appropriate link."
         do (setf (gethash link h) url)
         finally (return h)))
 
-(defun linker (links)
+(defun linker (links &optional target)
   "Rewrite a link tag into anchor."
-  #'(lambda (x) `((:a :href ,(get-url (link-key x) links)) ,@(link-contents x))))
+  #'(lambda (x) `((:a ,@(when target `(:target ,target)) :href ,(get-url (link-key x) links)) ,@(link-contents x))))
 
 (defun get-url (link h)
   "Lookup the URL for a link. Warn if none found."
-  (or (gethash link h) (progn (warn "No link found for ~a" link) "nowhere.html")))
+  (or
+   (gethash link h)
+   (and (string= link "http" :end1 4) link)
+   (progn (warn "No link found for ~a" link) "nowhere.html")))
 
 (defun link-key (link)
   "The key extracted from a :link, either the explicit :key value or
@@ -369,6 +428,20 @@ removed."
             `(:pre (:code ,(format nil "~{~&~a~}" (ldiff start end))))
             (error "Coludn't find include section ~a in ~a" name file)))))))
 
+
+(defun generic-html (doc config)
+  (let ((styles (config :styles config))
+        (scripts (config :scripts config)))
+    `(:progn
+       (:noescape "<!doctype html>")
+       ((:html :lang "en")
+        (:head
+         (:meta :http-equiv "content-type" :content "text/html; charset=UTF-8")
+         (:meta :http-equiv "X-UA-Compatible" :content "IE=edge,chrome=1")
+         ,@(loop for s in styles collecting s)
+         ,@(loop for s in scripts collecting s))
+        (:body
+         ,@(rest doc))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; This doesn't really belong here. This is specific to how I generate HTML for

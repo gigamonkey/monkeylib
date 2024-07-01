@@ -46,15 +46,18 @@ variable."
   (section-one-line
    "## " (-> name name) " "
    (=> one-line-text `(:section (,name ,@_)))
-   " ##." (or blank eol))
+   end-section-one-line)
 
   (one-line-text
-   (=> (many1 (or (text-until (or " ##." tag-open "[")) tagged-text linkref))))
+   (=> (many (or (text-until (or end-section-one-line tag-open "[")) tagged-text linkref))))
+
+  (end-section-one-line (optional " ") "##." (or blank eol))
 
   (section
    "## " (-> name name) blank
    (=> (many (and (! end-section) element)) `(:section (,name ,@_)))
    end-section)
+
 
   (end-section indentation "##." blank)
 
