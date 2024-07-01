@@ -16,4 +16,5 @@
    :walk-directory
    :directory-p
    :file-p
-   :parent-directory))
+   :parent-directory
+   :canonize))

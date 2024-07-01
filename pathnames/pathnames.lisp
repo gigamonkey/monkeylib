@@ -145,11 +145,15 @@ component. Returns its argument if name and type are both nil or
     (if (not (directory-pathname-p name))
       (make-pathname
        :directory (append (or (pathname-directory pathname) (list :relative))
-                          (list (file-namestring pathname)))
+                          (list (directory-component-name (file-namestring pathname))))
        :name      nil
        :type      nil
        :defaults pathname)
       pathname)))
+
+(defun directory-component-name (name)
+  "Kludge to translate .. into whatever the Lisp does when parsing a namestring."
+  (second (pathname-directory (namestring (make-pathname :directory `(:relative ,name))))))
 
 (defun pathname-as-file (name)
   "Return a pathname reperesenting the given pathname in `file form',
@@ -198,3 +202,24 @@ pathnames as well."
 (defun parent-directory (pathname)
   "Return the pathname of the directory containing pathname."
   (make-pathname :name nil :type nil :defaults (pathname-as-file pathname)))
+
+(defun canonize (pathname)
+  "Turn a pathname containing :up and :back elements into a canonical pathname.
+We're less fussy than cl-fad about the distinction between :up and :back,
+treating them both syntactically since that's what many Lisp's seem to do."
+  (let ((pathname (pathname pathname)))
+    (make-pathname
+     :defaults pathname
+     :directory (canonical-directory (pathname-directory pathname)))))
+
+(defun canonical-directory (directory)
+  (labels ((canonical (parts kept)
+             (cond
+               ((null parts) (nreverse kept))
+               ((string= (first parts) ".")
+                (canonical (rest parts) kept))
+               ((member (first parts) '(:up :back))
+                (canonical (rest parts) (rest kept)))
+               (t (canonical (rest parts) (cons (first parts) kept))))))
+  (destructuring-bind (kind . parts) directory
+    `(,kind ,@(canonical parts nil)))))
