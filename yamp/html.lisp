@@ -8,12 +8,6 @@
 
 (defvar *input-file*)
 
-;; FIXME: this is a gross hack so I can quick-and-dirty generate certain pages
-;; with targets on all their links. Need to find a better way to express this
-;; directly in markup or at least in the markup config and thread it through to
-;; HTML generation.
-(defparameter *link-target* nil)
-
 (defun generate-html (file)
   "Generate HTML for the markup file. Exact location determined by configuration options."
   (let ((*default-pathname-defaults* (parent-directory file))
@@ -199,16 +193,42 @@ the corresponding config file."
                  (clauses (file)
                    (loop for (tag . rest) in (file->list file) do
                      (cond
+                       ;; Included config files. Values are merged.
                        ((eql tag :include)
                         (clauses (merge-pathnames (first rest) file)))
+
+                       ;; Directory containing files with web-embeddable tweets.
                        ((eql tag :tweets)
                         (add-clause (cons tag (list (merge-pathnames (first rest) (parent-directory file))))))
+
+                       ;; The root directory, used to determine the part of the
+                       ;; markup filename that should be included in the
+                       ;; generated filename.
                        ((eql tag :root)
-                        ;;(break "~a ~a" (first rest) (pathname-directory (pathname (first rest))))
                         (add-clause (cons tag (list (truename (merge-pathnames (pathname (first rest)) (parent-directory file)))))))
+
+                       ;; targets are the target patterns in config file. When generating links if
+                       ;; the url matches a regexp in this config item (searched in order) the
+                       ;; corresponding target is used. E.g.
+                       ;;
+                       ;;   (:link-targets
+                       ;;     ("^https://example.com" "_blank")
+                       ;;     ("foo" "myWindow"))
+                       ;;
+                       ;; We compile them to scanners here.
+                       ((eql tag :link-targets)
+                        (add-clause (cons tag (compile-link-targets rest))))
+
+                       ;; Per file configuration, only added to the config if
+                       ;; the base name of the markup file matches.
                        ((stringp tag)
                         (when (string= tag (pathname-name filename))
                           (dolist (clause rest) (add-clause clause))))
+
+
+
+                       ;; Arbitrary other tags which can be used by user-written
+                       ;; HTML generator functions as they see fit.
                        (t (add-clause (cons tag rest)))))))
           (clauses config-file)
           (values (hash-table-alist h) config-file))))))
@@ -224,17 +244,22 @@ the corresponding config file."
                  (t (up (parent-directory dir)))))))
     (up (parent-directory name))))
 
+(defun compile-link-targets (patterns)
+  (mapcar
+   #'(lambda (p)
+       (destructuring-bind (pattern target) p
+         (list (cl-ppcre:create-scanner pattern) target)))
+   patterns))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Link rewriting
 
 (defun links (doc config)
-  (declare (ignore config))
   "Rewrite the doc so :link elements are expanded into :a tags with the
 appropriate link."
   (let ((linkdefs (get-linkdefs doc)))
     (funcall
-     (>>> (deleter :link_def) (rewriter :link (linker linkdefs *link-target*)))
+     (>>> (deleter :link_def) (rewriter :link (linker linkdefs (config :link-targets config))))
      doc)))
 
 (defun get-linkdefs (doc)
@@ -244,9 +269,20 @@ appropriate link."
         do (setf (gethash link h) url)
         finally (return h)))
 
-(defun linker (links &optional target)
+(defun linker (links targets)
   "Rewrite a link tag into anchor."
-  #'(lambda (x) `((:a ,@(when target `(:target ,target)) :href ,(get-url (link-key x) links)) ,@(link-contents x))))
+  (flet ((get-target (url)
+           (let ((pattern
+                   (find-if
+                    #'(lambda (pat)
+                        (cl-ppcre:scan (first pat) url))
+                    targets)))
+             (if pattern (second pattern) nil))))
+    #'(lambda (x)
+        (let* ((url (get-url (link-key x) links))
+               (target (get-target url))
+               (contents (link-contents x)))
+          `((:a ,@(when target `(:target ,target)) :href ,url) ,@contents)))))
 
 (defun get-url (link h)
   "Lookup the URL for a link. Warn if none found."
