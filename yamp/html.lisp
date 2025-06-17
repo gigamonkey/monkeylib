@@ -18,7 +18,6 @@
           (with-text-output (out)
             (monkeylib-html:emit-html
              (markup-html (markup (file-text file)) config))))
-        ;; Return t here since we invoke this from slime which chokes on the pathname.
         (namestring (truename output-file))))))
 
 (defun html-filename (file)
@@ -32,7 +31,7 @@
 the corresponding config file."
   (multiple-value-bind (config config-file) (load-config file)
     (when config
-      (let* ((root (or (first (config :root config)) (parent-directory config-file)))
+      (let* ((root (or (config :root config) (parent-directory config-file)))
              (enough (rest (pathname-directory (enough-namestring file root))))
              (html-file (funcall (filename-function config) file config enough)))
         (values (canonize (merge-pathnames html-file root)) config)))))
@@ -89,7 +88,9 @@ the corresponding config file."
 
             (rewriter :p #'deblock)
             (rewriter :§ (replacing-with (first (config :section-marker config))))
-            (rewriter :blank (replacing-with (first (config :blank config))))
+            (if (config :blank config)
+              (rewriter :blank (replacing-with (first (config :blank config))))
+              (deleter :blank))
 
             (spans-rewriter config)
 
@@ -188,7 +189,9 @@ the corresponding config file."
       (let ((h (make-hash-table)))
         (labels ((add-clause (clause)
                    (if (gethash (first clause) h)
-                     (appendf (gethash (first clause) h) (rest clause))
+                     (if (listp (rest clause))
+                       (appendf (gethash (first clause) h) (rest clause))
+                       (setf (gethash (first clause) h) (rest clause)))
                      (setf (gethash (first clause) h) (rest clause))))
                  (clauses (file)
                    (loop for (tag . rest) in (file->list file) do
@@ -205,7 +208,7 @@ the corresponding config file."
                        ;; markup filename that should be included in the
                        ;; generated filename.
                        ((eql tag :root)
-                        (add-clause (cons tag (list (truename (merge-pathnames (pathname (first rest)) (parent-directory file)))))))
+                        (add-clause (cons tag (truename (merge-pathnames (pathname rest) (parent-directory file))))))
 
                        ;; targets are the target patterns in config file. When generating links if
                        ;; the url matches a regexp in this config item (searched in order) the
@@ -225,11 +228,13 @@ the corresponding config file."
                         (when (string= tag (pathname-name filename))
                           (dolist (clause rest) (add-clause clause))))
 
-
-
                        ;; Arbitrary other tags which can be used by user-written
                        ;; HTML generator functions as they see fit.
-                       (t (add-clause (cons tag rest)))))))
+                       (t (cond
+                            ((eql rest :pwd)
+                             (add-clause (cons tag (truename (parent-directory file)))))
+                            (t
+                             (add-clause (cons tag rest)))))))))
           (clauses config-file)
           (values (hash-table-alist h) config-file))))))
 
@@ -289,7 +294,7 @@ appropriate link."
   (or
    (gethash link h)
    (and (string= link "http" :end1 4) link)
-   (progn (warn "No link found for ~a" link) "nowhere.html")))
+   (progn (warn "No link found for [~a] in ~a" link *input-file*) "nowhere.html")))
 
 (defun link-key (link)
   "The key extracted from a :link, either the explicit :key value or
@@ -383,7 +388,10 @@ ID to allow linking back."
 ;; HTMLization
 
 (defun htmlizer (config)
-  (let ((name (first (config :htmlizer config))))
+  ;; Not sure if this is quite right but when using nested directories that
+  ;; include the parent config, can end up with more than one htmlizer and we
+  ;; probably want the most deeply nested one.
+  (let ((name (first (last (config :htmlizer config)))))
     (if name
       #'(lambda (doc) (funcall (symbol-function name) doc config))
       #'htmlize)))
@@ -498,7 +506,9 @@ removed."
         (:body
          ((:div :class "wrap")
           (:header
-           (:figure ((:a :href "/") (:img :src "../img/monkey.jpg" (:figcaption "Original image by Luc Viatour / " ((:a :href "http://www.Lucnix.be") "www.Lucnix.be"))))))
+           (:figure
+            ((:a :href "/") (:img :src "../img/monkey.jpg"))
+            (:figcaption "Original image by Luc Viatour / " ((:a :href "http://www.Lucnix.be") "www.Lucnix.be"))))
           ((:div :class "contents") ,@(rest doc))
           (:footer
            (:p "Copyright " ,@(config :year config) " Peter Seibel")
