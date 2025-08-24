@@ -85,7 +85,7 @@ variable."
 
   (term
    indentation "% "
-   (=> (many1 (or (text-until (or tag-open " %")) tagged-text)) `(:dt ,@_))
+   (=> (many1 (or linkref tagged-text backtick-text (text-until (or tag-open " %")))) `(:dt ,@_))
    " %" (or blank eol))
 
   (definition

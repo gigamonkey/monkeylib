@@ -11,4 +11,9 @@ Testing a definition list
   % Term 3 with a \% in it %
   Definition 3
 
+  % [a link] %
+  This is a linked term.
+
 New paragraph.
+
+[a link] <https://example.com>
